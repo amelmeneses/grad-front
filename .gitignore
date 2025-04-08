@@ -1,0 +1,47 @@
+# === DEPENDENCIAS ===
+node_modules/       # Librerías instaladas con npm/yarn/pnpm
+
+# === BUILD ===
+dist/               # Build final generado por Vite
+.vite/              # Carpeta de caché de Vite
+.vite-cache/
+
+# === ARCHIVOS DE ENTORNO ===
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# === CACHÉS Y TEMPORALES ===
+.cache/             # Parcel, Vuepress, etc.
+.parcel-cache/
+.nyc_output         # Test coverage (nyc)
+coverage/           # Cobertura de pruebas (jest, vitest)
+*.tsbuildinfo       # Cache de TypeScript
+*.log               # Archivos de log
+*.tgz               # Paquetes generados por npm pack
+
+# === EDITORES ===
+.vscode/
+.idea/
+*.swp               # Archivos swap de editores (Vim, etc.)
+
+# === SISTEMA OPERATIVO ===
+.DS_Store           # macOS
+Thumbs.db           # Windows
+
+# === NAVEGADORES ===
+.sass-cache/
+.cache-loader/
+
+# === OTRAS HERRAMIENTAS ===
+.eslintcache        # ESLint
+.stylelintcache     # Stylelint
+.yarn/
+.pnpm-debug.log*
+.yarn-integrity
+
+# === OPCIONAL ===
+# Si usas GitHub Codespaces o VSCode devcontainers
+.devcontainer/

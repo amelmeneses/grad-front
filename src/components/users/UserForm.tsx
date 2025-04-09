@@ -1,50 +1,44 @@
 import React, { useState } from "react";
-import api from "../../api";
+import { createUser } from "../../api/users";
+import { User } from "../../interfaces/User";
 
-const UserForm: React.FC = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [age, setAge] = useState<number | "">("");
+const UserForm = ({ onUserAdded }: { onUserAdded: () => void }) => {
+  const [form, setForm] = useState<User>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+    birth_date: "",
+    role: ""
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await api.post("/users", { name, email, age });
-      alert("User added successfully!");
-      setName("");
-      setEmail("");
-      setAge("");
-    } catch (error) {
-      console.error("Error adding user:", error);
-      alert("Failed to add user.");
-    }
+    await createUser(form);
+    setForm({
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      birth_date: "",
+      role: ""
+    });
+    onUserAdded();
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Add User</h2>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
-        required
-      />
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-        required
-      />
-      <input
-        type="number"
-        value={age}
-        onChange={(e) => setAge(Number(e.target.value))}
-        placeholder="Age"
-        required
-      />
-      <button type="submit">Add User</button>
+      <input name="first_name" value={form.first_name} onChange={handleChange} placeholder="Nombre" />
+      <input name="last_name" value={form.last_name} onChange={handleChange} placeholder="Apellido" />
+      <input name="email" value={form.email} onChange={handleChange} placeholder="Email" />
+      <input name="password" value={form.password} onChange={handleChange} placeholder="Contraseña" />
+      <input name="birth_date" value={form.birth_date} onChange={handleChange} placeholder="Fecha de nacimiento" />
+      <input name="role" value={form.role} onChange={handleChange} placeholder="Rol" />
+      <button type="submit">Crear Usuario</button>
     </form>
   );
 };

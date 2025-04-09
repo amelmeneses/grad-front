@@ -1,24 +1,18 @@
-import React, { useEffect, useState } from "react";
-import api from "../../api";
+import { useEffect, useState } from "react";
+import { getUsers, deleteUser } from "../../api/users";
+import { User } from "../../interfaces/User";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  age: number;
-}
-
-const UserList: React.FC = () => {
+const UserList = () => {
   const [users, setUsers] = useState<User[]>([]);
-
-  // Fetch users from the backend
+  
   const fetchUsers = async () => {
-    try {
-      const response = await api.get("/users");
-      setUsers(response.data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
+    const data = await getUsers();
+    setUsers(data);
+  };
+
+  const handleDelete = async (id: number) => {
+    await deleteUser(id);
+    fetchUsers();
   };
 
   useEffect(() => {
@@ -27,11 +21,12 @@ const UserList: React.FC = () => {
 
   return (
     <div>
-      <h2>User List</h2>
+      <h2>Lista de Usuarios</h2>
       <ul>
         {users.map((user) => (
           <li key={user.id}>
-            {user.name} - {user.email} - {user.age}
+            {user.first_name} {user.last_name} - {user.email}
+            <button onClick={() => handleDelete(user.id!)}>Eliminar</button>
           </li>
         ))}
       </ul>

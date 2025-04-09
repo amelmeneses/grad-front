@@ -1,6 +1,6 @@
 import React from "react";
-import UserList from "./components/UserList";
-import UserForm from "./components/UserForm";
+import UserList from "./components/Users/UserList";
+import UserForm from "./components/Users/UserForm";
 
 const App: React.FC = () => {
   return (

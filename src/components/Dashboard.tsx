@@ -1,6 +1,6 @@
 // src/components/Dashboard.tsx
-import React, { useState } from 'react';
-import axios from 'axios';
+import { useState } from 'react';
+//mport axios from 'axios';
 import UserForm from "../components/users/UserForm";
 import UserList from "../components/users/UserList";
 import CompanyForm from "../components/companies/CompanyForm";

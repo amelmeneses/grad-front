@@ -1,24 +1,48 @@
 // src/components/LoginPage.tsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from 'react-router-dom';
+
+interface TokenPayload {
+  id: number;
+  role: number;
+  exp: number;
+}
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     try {
-      // Aquí actualizamos la URL para que apunte a tu backend
       const response = await axios.post('http://localhost:5001/api/login', { email, password });
+      const token = response.data.token;
+      localStorage.setItem('token', token);
 
-      // Guardar el token en el almacenamiento local
-      localStorage.setItem('token', response.data.token);
+      // Decodifica el JWT para extraer el role
+      const payload: TokenPayload = jwtDecode<TokenPayload>(token);
 
-      // Redirigir a la página principal o dashboard
-      window.location.href = '/dashboard';
+      // Redirige según el role
+      switch (payload.role) {
+        case 1:
+          navigate('/dashboard-admin');
+          break;
+        case 2:
+          navigate('/dashboard-company');
+          break;
+        case 3:
+          navigate('/dashboard-user');
+          break;
+        default:
+          setError('Rol no reconocido');
+      }
     } catch (err: any) {
       setError('Correo o contraseña incorrectos');
     }
@@ -77,7 +101,12 @@ const LoginPage = () => {
           </button>
         </div>
         <div className="mt-4 text-center">
-          <p className="text-sm">¿No tienes una cuenta? <a href="/register" className="text-blue-500">Registrarse ahora</a></p>
+          <p className="text-sm">
+            ¿No tienes una cuenta?{' '}
+            <a href="/register" className="text-blue-500">
+              Registrarse ahora
+            </a>
+          </p>
         </div>
       </div>
     </div>

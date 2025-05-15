@@ -1,6 +1,8 @@
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import AdminDashboard from './components/AdminDashboard';
+import ManageUsers from './components/ManageUsers';
 import UserDashboard from './components/UserDashboard';
 import CompanyDashboard from './components/CompanyDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -10,10 +12,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public route: login */}
+        {/* Public */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Admin-only */}
+        {/* Admin menu */}
         <Route
           path="/dashboard-admin"
           element={
@@ -23,7 +25,17 @@ function App() {
           }
         />
 
-        {/* Solo empresa */}
+        {/* Admin → Manage Users */}
+        <Route
+          path="/admin/users"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <ManageUsers />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Company & User dashboards... */}
         <Route
           path="/dashboard-company"
           element={
@@ -32,8 +44,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* solo Usuario */}
         <Route
           path="/dashboard-user"
           element={
@@ -43,10 +53,8 @@ function App() {
           }
         />
 
-        {/* Forbidden page route */}
+        {/* 403 & fallback */}
         <Route path="/403" element={<Forbidden />} />
-
-        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

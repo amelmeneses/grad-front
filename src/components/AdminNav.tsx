@@ -1,6 +1,9 @@
+// src/components/AdminNav.tsx
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiGrid, FiUser } from 'react-icons/fi';
 import { MdSportsBasketball } from 'react-icons/md';
+import logo from '../assets/logop.svg';
 
 export default function AdminNav() {
   const location = useLocation();
@@ -13,13 +16,13 @@ export default function AdminNav() {
 
   return (
     <aside className="w-64 bg-white border-r h-screen p-6 flex flex-col">
-      {/* Logo */}
+      {/* Logo y título */}
       <div className="mb-8 flex items-center space-x-2">
-        <img src="src/assets/logop.svg" alt="Playbooker" className="h-8 w-auto" />
+        <img src={logo} alt="Playbooker" className="h-8 w-auto" />
         <span className="text-xl font-bold">Playbooker</span>
       </div>
 
-      {/* Menu */}
+      {/* Menú */}
       <nav className="flex-1">
         <ul className="space-y-4">
           {menuItems.map((item) => {
@@ -41,8 +44,6 @@ export default function AdminNav() {
           })}
         </ul>
       </nav>
-
-      {/* User menu or profile can go here */}
     </aside>
   );
 }

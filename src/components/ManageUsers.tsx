@@ -1,6 +1,7 @@
 // src/components/ManageUsers.tsx
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import AdminNav from './AdminNav';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 
 interface User {
@@ -9,6 +10,7 @@ interface User {
   apellido: string;
   email: string;
   Role: { nombre: string };
+  avatarUrl?: string;
 }
 
 export default function ManageUsers() {
@@ -17,16 +19,18 @@ export default function ManageUsers() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    axios
-      .get<User[]>('http://localhost:5001/api/users')
-      .then(res => {
-        setUsers(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('No se pudieron cargar los usuarios');
-        setLoading(false);
-      });
+    const token = localStorage.getItem('token');
+    axios.get<User[]>('http://localhost:5001/api/users', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      setUsers(res.data);
+      setLoading(false);
+    })
+    .catch(() => {
+      setError('No se pudieron cargar los usuarios');
+      setLoading(false);
+    });
   }, []);
 
   if (loading) return <div className="p-8">Cargando usuarios…</div>;
@@ -34,28 +38,18 @@ export default function ManageUsers() {
 
   return (
     <div className="flex min-h-screen bg-white">
-      {/* -- Aquí podrías extraer el sidebar a un componente -- */}
-      <aside className="w-64 border-r p-6 bg-gray-50">
-        <h2 className="text-xl font-semibold mb-6">Playbooker</h2>
-        <nav className="space-y-3">
-          <a href="/dashboard-admin" className="block text-gray-700 hover:text-blue-500">Dashboard</a>
-          <a href="/admin/users" className="block text-blue-500 font-medium">Usuario</a>
-          <a href="/admin/courts" className="block text-gray-700 hover:text-blue-500">Canchas</a>
-        </nav>
-      </aside>
-
+      <AdminNav />
       <main className="flex-1 p-8">
         <header className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold">Usuarios</h1>
             <p className="text-gray-600">lista de usuarios</p>
           </div>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          <button className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow">
             Añadir Usuario
           </button>
         </header>
-
-        <div className="overflow-auto">
+        <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead>
               <tr className="bg-gray-100 text-left text-sm text-gray-600 uppercase">
@@ -71,11 +65,20 @@ export default function ManageUsers() {
               {users.map(u => (
                 <tr key={u.id} className="border-b hover:bg-gray-50">
                   <td className="p-3"><input type="checkbox" /></td>
-                  <td className="p-3">{u.nombre}</td>
+                  <td className="flex items-center p-3 space-x-2">
+                    {u.avatarUrl ? (
+                      <img src={u.avatarUrl} alt={u.nombre} className="w-8 h-8 rounded-full" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                        {u.nombre.charAt(0)}
+                      </div>
+                    )}
+                    <span>{u.nombre}</span>
+                  </td>
                   <td className="p-3">{u.apellido}</td>
                   <td className="p-3">{u.email}</td>
                   <td className="p-3">{u.Role.nombre}</td>
-                  <td className="p-3 text-center space-x-2">
+                  <td className="p-3 text-center space-x-3">
                     <button className="text-blue-500 hover:text-blue-700">
                       <FaEdit />
                     </button>

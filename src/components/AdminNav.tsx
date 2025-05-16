@@ -1,5 +1,4 @@
 // src/components/AdminNav.tsx
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FiGrid, FiUser } from 'react-icons/fi';
 import { MdSportsBasketball } from 'react-icons/md';

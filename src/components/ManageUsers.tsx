@@ -1,5 +1,5 @@
 // src/components/ManageUsers.tsx
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminNav from './AdminNav';
 import { FaEdit, FaTrash } from 'react-icons/fa';

@@ -1,8 +1,10 @@
 // src/App.tsx
+
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/LoginPage';
 import AdminDashboard from './components/AdminDashboard';
 import ManageUsers from './components/ManageUsers';
+import UserForm from './components/UserForm';           // ← importa el formulario
 import UserDashboard from './components/UserDashboard';
 import CompanyDashboard from './components/CompanyDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -35,7 +37,27 @@ function App() {
           }
         />
 
-        {/* Company & User dashboards... */}
+        {/* Admin → Crear Usuario */}
+        <Route
+          path="/admin/user"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <UserForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin → Editar Usuario */}
+        <Route
+          path="/admin/user/:id"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <UserForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Company & User dashboards */}
         <Route
           path="/dashboard-company"
           element={

@@ -1,6 +1,7 @@
 // src/components/ManageUsers.tsx
 
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminNav from './AdminNav';
 import { FaEdit, FaTrash } from 'react-icons/fa';
@@ -18,6 +19,7 @@ export default function ManageUsers() {
   const [users, setUsers]     = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -48,6 +50,7 @@ export default function ManageUsers() {
             <p className="text-gray-600">Lista de usuarios</p>
           </div>
           <button
+            onClick={() => navigate('/admin/user')}
             className="px-5 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
                        text-white font-medium rounded-lg shadow-lg
                        hover:opacity-90 transition"
@@ -91,14 +94,13 @@ export default function ManageUsers() {
                   <td className="p-3 text-gray-800">{u.email}</td>
                   <td className="p-3 text-gray-800">{u.Role.nombre}</td>
                   <td className="p-3 text-center space-x-2">
-                    {/* Editar */}
                     <button
+                      onClick={() => navigate(`/admin/user/${u.id}`)}
                       className="bg-white p-2 rounded-lg border border-gray-200
                                  hover:bg-gray-100 transition"
                     >
                       <FaEdit className="text-[#0B91C1]" size={16} />
                     </button>
-                    {/* Eliminar */}
                     <button
                       className="bg-white p-2 rounded-lg border border-gray-200
                                  hover:bg-gray-100 transition"

@@ -21,21 +21,61 @@ export default function ManageUsers() {
   const [error, setError]     = useState<string | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    axios
-      .get<User[]>('http://localhost:5001/api/users', {
+  // carga la lista de usuarios
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const res = await axios.get<User[]>('http://localhost:5001/api/users', {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(res => {
-        setUsers(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError('No se pudieron cargar los usuarios');
-        setLoading(false);
       });
+      setUsers(res.data);
+      setError(null);
+    } catch {
+      setError('No se pudieron cargar los usuarios');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
   }, []);
+
+  // elimina un usuario con confirmación y muestra solo el mensaje limpio
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('¿Está seguro que desea eliminar este usuario?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5001/api/users/delete/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchUsers();
+    } catch (err: any) {
+      const data = err.response?.data;
+      let msg = 'Error al eliminar el usuario';
+
+      if (data?.message) {
+        // caso JSON { message: '...' }
+        msg = data.message;
+      } else if (typeof data === 'string') {
+        // vino como HTML o string con stack, limpiamos etiquetas y entidades
+        let text = data.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
+        // arrancamos después de "Error:"
+        const idx = text.indexOf('Error:');
+        if (idx !== -1) {
+          text = text.slice(idx + 'Error:'.length);
+        }
+        // quitamos todo después de " at "
+        msg = text.split(/\bat\b/)[0].trim();
+      }
+
+      alert(msg);
+    }
+  };
 
   if (loading) return <div className="p-8">Cargando usuarios…</div>;
   if (error)   return <div className="p-8 text-red-500">{error}</div>;
@@ -67,7 +107,7 @@ export default function ManageUsers() {
                 <th className="p-3">Apellidos</th>
                 <th className="p-3">Email</th>
                 <th className="p-3">Role</th>
-                <th className="p-3 text-center">Action</th>
+                <th className="p-3 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -81,10 +121,8 @@ export default function ManageUsers() {
                         className="w-8 h-8 rounded-full"
                       />
                     ) : (
-                      <div
-                        className="w-8 h-8 rounded-full bg-gray-200
-                                   flex items-center justify-center text-gray-600"
-                      >
+                      <div className="w-8 h-8 rounded-full bg-gray-200
+                                      flex items-center justify-center text-gray-600">
                         {u.nombre.charAt(0)}
                       </div>
                     )}
@@ -102,6 +140,7 @@ export default function ManageUsers() {
                       <FaEdit className="text-[#0B91C1]" size={16} />
                     </button>
                     <button
+                      onClick={() => handleDelete(u.id)}
                       className="bg-white p-2 rounded-lg border border-gray-200
                                  hover:bg-gray-100 transition"
                     >

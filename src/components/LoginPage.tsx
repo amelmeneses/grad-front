@@ -1,8 +1,11 @@
 // src/components/LoginPage.tsx
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+// Ajusta la ruta según tu estructura
+import singInImage from '../assets/imagen_singIn.svg';
 
 interface TokenPayload {
   id: number;
@@ -11,102 +14,124 @@ interface TokenPayload {
 }
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail]           = useState('');
+  const [password, setPassword]     = useState('');
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]           = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
     try {
-      const response = await axios.post('http://localhost:5001/api/login', { email, password });
-      const token = response.data.token;
-      localStorage.setItem('token', token);
+      const { data } = await axios.post('http://localhost:5001/api/login', { email, password });
+      const payload: TokenPayload = jwtDecode<TokenPayload>(data.token);
+      localStorage.setItem('token', data.token);
 
-      // Decodifica el JWT para extraer el role
-      const payload: TokenPayload = jwtDecode<TokenPayload>(token);
-
-      // Redirige según el role
-      switch (payload.role) {
-        case 1:
-          navigate('/dashboard-admin');
-          break;
-        case 2:
-          navigate('/dashboard-company');
-          break;
-        case 3:
-          navigate('/dashboard-user');
-          break;
-        default:
-          setError('Rol no reconocido');
-      }
-    } catch (err: any) {
+      if (payload.role === 1)      navigate('/dashboard-admin');
+      else if (payload.role === 2) navigate('/dashboard-company');
+      else if (payload.role === 3) navigate('/dashboard-user');
+      else setError('Rol no reconocido');
+    } catch {
       setError('Correo o contraseña incorrectos');
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-3xl font-semibold text-center mb-6">Bienvenido de nuevo</h2>
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              className="w-full p-3 border border-gray-300 rounded-md mt-2"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Ingresa tu email"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">Contraseña</label>
-            <input
-              type="password"
-              className="w-full p-3 border border-gray-300 rounded-md mt-2"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Ingresa tu contraseña"
-              required
-            />
-          </div>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
+    // Este div cubre TODO el ancho de la pantalla
+    <div className="min-h-screen w-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex flex-col md:flex-row items-center w-full">
+        {/* ————— Tarjeta del formulario ————— */}
+        <div className="w-full md:w-1/2 max-w-md mx-auto md:mx-0 
+                        bg-white bg-opacity-60 backdrop-blur-md p-8 
+                        rounded-3xl shadow-xl">
+          <h2 className="text-3xl font-semibold text-gray-800 mb-2 text-center">
+            Bienvenido de nuevo
+          </h2>
+          <p className="text-sm text-gray-600 mb-6 text-center">
+            Por favor, introduzca sus datos.
+          </p>
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
               <input
-                type="checkbox"
-                checked={rememberMe}
-                onChange={() => setRememberMe(!rememberMe)}
-                className="mr-2"
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="Ingresa tu email"
+                required
+                className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                           rounded-xl shadow-inner text-gray-800
+                           focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
               />
-              <label className="text-sm text-gray-600">Recordar por 30 días</label>
             </div>
-            <a href="#" className="text-sm text-blue-500">Olvidar contraseña?</a>
-          </div>
-          <button
-            type="submit"
-            className="w-full p-3 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            Iniciar sesión
-          </button>
-        </form>
-        <div className="mt-4 text-center">
-          <button className="w-full p-3 bg-white text-gray-600 border border-gray-300 rounded-md hover:bg-gray-100">
-            <i className="fab fa-google mr-2"></i> Iniciar sesión con Google
-          </button>
-        </div>
-        <div className="mt-4 text-center">
-          <p className="text-sm">
+
+            {/* Contraseña */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Contraseña
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="Ingresa tu contraseña"
+                required
+                className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                           rounded-xl shadow-inner text-gray-800
+                           focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
+              />
+            </div>
+
+            {/* Recordar / Olvidar */}
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={() => setRememberMe(!rememberMe)}
+                  className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded 
+                             focus:ring-[#0B91C1]"
+                />
+                <span className="ml-2">Recordar por 30 días</span>
+              </label>
+              <a href="#" className="text-[#0B91C1] hover:underline">
+                Olvidar contraseña?
+              </a>
+            </div>
+
+            {/* Botón gradient */}
+            <button
+              type="submit"
+              className="w-full py-3 font-medium text-white rounded-xl 
+                         bg-gradient-to-r from-[#0B91C1] to-[#EB752B] 
+                         shadow-lg hover:opacity-90 transition"
+            >
+              Iniciar sesión
+            </button>
+          </form>
+
+          {/* Registrarse */}
+          <p className="mt-6 text-center text-sm text-gray-600">
             ¿No tienes una cuenta?{' '}
-            <a href="/register" className="text-blue-500">
+            <a href="/register" className="text-[#0B91C1] font-medium hover:underline">
               Registrarse ahora
             </a>
           </p>
+        </div>
+
+        {/* ————— Ilustración ————— */}
+        <div className="hidden md:flex md:w-1/2 justify-center items-center">
+          <img
+            src={singInImage}
+            alt="Ilustración deportiva"
+            className="max-w-full h-auto object-contain"
+          />
         </div>
       </div>
     </div>

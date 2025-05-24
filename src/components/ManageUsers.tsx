@@ -1,4 +1,5 @@
 // src/components/ManageUsers.tsx
+
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminNav from './AdminNav';
@@ -14,23 +15,24 @@ interface User {
 }
 
 export default function ManageUsers() {
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers]     = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]     = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    axios.get<User[]>('http://localhost:5001/api/users', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    .then(res => {
-      setUsers(res.data);
-      setLoading(false);
-    })
-    .catch(() => {
-      setError('No se pudieron cargar los usuarios');
-      setLoading(false);
-    });
+    axios
+      .get<User[]>('http://localhost:5001/api/users', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(res => {
+        setUsers(res.data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setError('No se pudieron cargar los usuarios');
+        setLoading(false);
+      });
   }, []);
 
   if (loading) return <div className="p-8">Cargando usuarios…</div>;
@@ -43,17 +45,21 @@ export default function ManageUsers() {
         <header className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-2xl font-bold">Usuarios</h1>
-            <p className="text-gray-600">lista de usuarios</p>
+            <p className="text-gray-600">Lista de usuarios</p>
           </div>
-          <button className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 shadow">
+          <button
+            className="px-5 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                       text-white font-medium rounded-lg shadow-lg
+                       hover:opacity-90 transition"
+          >
             Añadir Usuario
           </button>
         </header>
+
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead>
               <tr className="bg-gray-100 text-left text-sm text-gray-600 uppercase">
-                <th className="p-3"><input type="checkbox" /></th>
                 <th className="p-3">Nombres</th>
                 <th className="p-3">Apellidos</th>
                 <th className="p-3">Email</th>
@@ -64,26 +70,40 @@ export default function ManageUsers() {
             <tbody>
               {users.map(u => (
                 <tr key={u.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3"><input type="checkbox" /></td>
                   <td className="flex items-center p-3 space-x-2">
                     {u.avatarUrl ? (
-                      <img src={u.avatarUrl} alt={u.nombre} className="w-8 h-8 rounded-full" />
+                      <img
+                        src={u.avatarUrl}
+                        alt={u.nombre}
+                        className="w-8 h-8 rounded-full"
+                      />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
+                      <div
+                        className="w-8 h-8 rounded-full bg-gray-200
+                                   flex items-center justify-center text-gray-600"
+                      >
                         {u.nombre.charAt(0)}
                       </div>
                     )}
-                    <span>{u.nombre}</span>
+                    <span className="text-gray-800">{u.nombre}</span>
                   </td>
-                  <td className="p-3">{u.apellido}</td>
-                  <td className="p-3">{u.email}</td>
-                  <td className="p-3">{u.Role.nombre}</td>
-                  <td className="p-3 text-center space-x-3">
-                    <button className="text-blue-500 hover:text-blue-700">
-                      <FaEdit />
+                  <td className="p-3 text-gray-800">{u.apellido}</td>
+                  <td className="p-3 text-gray-800">{u.email}</td>
+                  <td className="p-3 text-gray-800">{u.Role.nombre}</td>
+                  <td className="p-3 text-center space-x-2">
+                    {/* Editar */}
+                    <button
+                      className="bg-white p-2 rounded-lg border border-gray-200
+                                 hover:bg-gray-100 transition"
+                    >
+                      <FaEdit className="text-[#0B91C1]" size={16} />
                     </button>
-                    <button className="text-red-500 hover:text-red-700">
-                      <FaTrash />
+                    {/* Eliminar */}
+                    <button
+                      className="bg-white p-2 rounded-lg border border-gray-200
+                                 hover:bg-gray-100 transition"
+                    >
+                      <FaTrash className="text-red-500" size={16} />
                     </button>
                   </td>
                 </tr>

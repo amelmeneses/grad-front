@@ -37,7 +37,7 @@ export default function UserForm() {
     apellido: '',
     email: '',
     contrasena: '',
-    rol_id: 2,       // por defecto “usuarios”
+    rol_id: 2, // por defecto “usuarios”
   })
   const [confirmPassword, setConfirmPassword] = useState('')
   const [empresa, setEmpresa] = useState<EmpresaData>({
@@ -50,30 +50,33 @@ export default function UserForm() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // buscamos dinámicamente el id del rol “empresas”
+  // ID dinámico del rol “empresas”
   const companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresas')?.id
 
-  // 1) cargar roles al montar
+  // Carga inicial: roles → (si edit) usuario + empresa
   useEffect(() => {
     const token = localStorage.getItem('token')
     axios
       .get<Role[]>('http://localhost:5001/api/roles', {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(res => setRoles(res.data))
-      .catch(() => {})
-      .finally(() => {
-        // sólo luego de roles, si es edición, cargamos usuario
-        if (isEdit) loadUser()
-        else setLoading(false)
+      .then(res => {
+        setRoles(res.data)
+        if (isEdit) {
+          loadUser()
+        } else {
+          setLoading(false)
+        }
       })
+      .catch(() => setLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // 2) si hay id, cargamos usuario + su empresa
+  // Obtener usuario + empresa si id existe
   const loadUser = async () => {
     try {
       const token = localStorage.getItem('token')
+      // 1) GET usuario
       const { data: u } = await axios.get<any>(
         `http://localhost:5001/api/users/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -86,32 +89,32 @@ export default function UserForm() {
         rol_id: u.rol_id,
       })
 
-      // siempre intentamos cargar empresa si existe
-      const { data: empresas } = await axios.get<EmpresaData[]>(
-        `http://localhost:5001/api/empresas?usuario_id=${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      )
-      if (empresas.length) {
-        const e = empresas[0]
-        setEmpresa({
-          id: e.id,
-          nombre: e.nombre,
-          contacto_email: e.contacto_email,
-          contacto_telefono: e.contacto_telefono,
-          direccion: e.direccion,
-        })
-        setEmpresaId(e.id!)
+      // 2) Si el usuario es de rol “empresas”, GET empresa asociada
+      if (u.rol_id === companyRoleId) {
+        const { data: empresas } = await axios.get<EmpresaData[]>(
+          `http://localhost:5001/api/empresas?usuario_id=${id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
+        if (empresas.length) {
+          const e = empresas[0]
+          setEmpresa({
+            id: e.id,
+            nombre: e.nombre,
+            contacto_email: e.contacto_email,
+            contacto_telefono: e.contacto_telefono,
+            direccion: e.direccion,
+          })
+          setEmpresaId(e.id!)
+        }
       }
     } catch {
-      setError('No se pudo cargar el usuario')
+      setError('No se pudo cargar el usuario.')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setForm(f => ({
       ...f,
@@ -126,7 +129,7 @@ export default function UserForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // validación de contraseñas
+    // validar contraseñas
     if (!isEdit || form.contrasena) {
       if (form.contrasena !== confirmPassword) {
         setError('Las contraseñas no coinciden.')
@@ -138,7 +141,7 @@ export default function UserForm() {
       const token = localStorage.getItem('token')
       let userId = id
 
-      // crear o actualizar usuario
+      // POST o PUT usuario
       if (isEdit) {
         await axios.put(
           `http://localhost:5001/api/users/${id}`,
@@ -154,7 +157,7 @@ export default function UserForm() {
         userId = String((res.data as any).id)
       }
 
-      // si el rol seleccionado es el de empresas, creamos o actualizamos
+      // sólo si el rol seleccionado es “empresas”
       if (companyRoleId && form.rol_id === companyRoleId) {
         const payload = {
           nombre: empresa.nombre,
@@ -163,7 +166,6 @@ export default function UserForm() {
           direccion: empresa.direccion,
           usuario_id: Number(userId),
         }
-
         if (empresaId) {
           await axios.put(
             `http://localhost:5001/api/empresas/${empresaId}`,
@@ -181,7 +183,7 @@ export default function UserForm() {
 
       navigate('/admin/users')
     } catch {
-      setError('Hubo un error al guardar.')
+      setError('Error al guardar.')
     }
   }
 
@@ -196,160 +198,134 @@ export default function UserForm() {
         </h1>
         {error && <p className="mb-4 text-red-500">{error}</p>}
 
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-5 bg-white p-6 rounded-2xl shadow-lg"
-        >
+        <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
           {/* Nombre */}
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">
-              Nombre
-            </label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre</label>
             <input
               name="nombre"
               value={form.nombre}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
           {/* Apellido */}
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">
-              Apellido
-            </label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Apellido</label>
             <input
               name="apellido"
               value={form.apellido}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">
-              Email
-            </label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Email</label>
             <input
               name="email"
               type="email"
               value={form.email}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
           {/* Contraseña */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-900">
-              Contraseña{' '}
-              {isEdit && (
-                <span className="text-xs">(vacío = sin cambio)</span>
-              )}
+              Contraseña {isEdit && <span className="text-xs">(vacío = sin cambio)</span>}
             </label>
             <input
               name="contrasena"
               type="password"
               value={form.contrasena}
               onChange={handleChange}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
           {/* Confirmar Contraseña */}
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">
-              Confirmar Contraseña
-            </label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Confirmar Contraseña</label>
             <input
               type="password"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              onChange={e => setConfirmPassword(e.target.value)}
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
           {/* Rol */}
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">
-              Rol
-            </label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Rol</label>
             <select
               name="rol_id"
               value={form.rol_id}
               onChange={handleChange}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900 font-semibold"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             >
-              {roles.map((r) => (
-                <option key={r.id} value={r.id}>
+              {roles.map(r => (
+                <option key={r.id} value={r.id} className="text-gray-900">
                   {r.nombre.charAt(0).toUpperCase() + r.nombre.slice(1)}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Campos Empresa (solo si el rol coincide) */}
+          {/* Campos Empresa */}
           {companyRoleId && form.rol_id === companyRoleId && (
             <>
               <hr className="my-4 border-gray-200" />
-              <h2 className="text-lg font-bold text-gray-900 mb-2">
-                Datos de Empresa
-              </h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-2">Datos de Empresa</h2>
 
               <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">
-                  Nombre Empresa
-                </label>
+                <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre Empresa</label>
                 <input
                   name="nombre"
                   value={empresa.nombre}
                   onChange={handleEmpresa}
                   required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">
-                  Email de Contacto
-                </label>
+                <label className="block mb-1 text-sm font-semibold text-gray-900">Email de Contacto</label>
                 <input
                   name="contacto_email"
                   type="email"
                   value={empresa.contacto_email}
                   onChange={handleEmpresa}
                   required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">
-                  Teléfono de Contacto
-                </label>
+                <label className="block mb-1 text-sm font-semibold text-gray-900">Teléfono de Contacto</label>
                 <input
                   name="contacto_telefono"
                   value={empresa.contacto_telefono}
                   onChange={handleEmpresa}
                   required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                 />
               </div>
 
               <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">
-                  Dirección
-                </label>
+                <label className="block mb-1 text-sm font-semibold text-gray-900">Dirección</label>
                 <input
                   name="direccion"
                   value={empresa.direccion}
                   onChange={handleEmpresa}
                   required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                 />
               </div>
             </>

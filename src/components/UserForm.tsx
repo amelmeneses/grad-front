@@ -22,7 +22,7 @@ interface FormState {
   nombre: string
   apellido: string
   email: string
-  contrasena: string
+  password: string
   rol_id: number
 }
 
@@ -36,8 +36,8 @@ export default function UserForm() {
     nombre: '',
     apellido: '',
     email: '',
-    contrasena: '',
-    rol_id: 2, // por defecto “usuarios”
+    password: '',
+    rol_id: 2, // “usuarios” por defecto
   })
   const [confirmPassword, setConfirmPassword] = useState('')
   const [empresa, setEmpresa] = useState<EmpresaData>({
@@ -50,33 +50,29 @@ export default function UserForm() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // ID dinámico del rol “empresas”
-  const companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresas')?.id
-
-  // Carga inicial: roles → (si edit) usuario + empresa
+  // 1) Cargo roles y, si edito, usuario+empresa
   useEffect(() => {
     const token = localStorage.getItem('token')
-    axios
-      .get<Role[]>('http://localhost:5001/api/roles', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(res => {
-        setRoles(res.data)
-        if (isEdit) {
-          loadUser()
-        } else {
-          setLoading(false)
-        }
-      })
-      .catch(() => setLoading(false))
+    axios.get<Role[]>('http://localhost:5001/api/roles', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    .then(res => {
+      const fetchedRoles = res.data
+      setRoles(fetchedRoles)
+      if (isEdit) {
+        loadUser(fetchedRoles)
+      } else {
+        setLoading(false)
+      }
+    })
+    .catch(() => setLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Obtener usuario + empresa si id existe
-  const loadUser = async () => {
+  // 2) Si edito, traigo usuario y su empresa (sin depender aún de state.roles)
+  const loadUser = async (fetchedRoles: Role[]) => {
     try {
       const token = localStorage.getItem('token')
-      // 1) GET usuario
       const { data: u } = await axios.get<any>(
         `http://localhost:5001/api/users/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -85,27 +81,28 @@ export default function UserForm() {
         nombre: u.nombre,
         apellido: u.apellido,
         email: u.email,
-        contrasena: '',
-        rol_id: u.rol_id,
+        password: '',
+        rol_id: u.rol_id
       })
 
-      // 2) Si el usuario es de rol “empresas”, GET empresa asociada
-      if (u.rol_id === companyRoleId) {
-        const { data: empresas } = await axios.get<EmpresaData[]>(
-          `http://localhost:5001/api/empresas?usuario_id=${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-        if (empresas.length) {
-          const e = empresas[0]
-          setEmpresa({
-            id: e.id,
-            nombre: e.nombre,
-            contacto_email: e.contacto_email,
-            contacto_telefono: e.contacto_telefono,
-            direccion: e.direccion,
-          })
-          setEmpresaId(e.id!)
-        }
+      // calculamos aquí localmente companyRoleId
+      const companyRoleId = fetchedRoles.find(r => r.nombre.toLowerCase() === 'empresas')?.id
+
+      // siempre traemos empresa si existe
+      const { data: empresas } = await axios.get<EmpresaData[]>(
+        `http://localhost:5001/api/empresas?usuario_id=${id}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      if (empresas.length && u.rol_id === companyRoleId) {
+        const e = empresas[0]
+        setEmpresa({
+          id: e.id,
+          nombre: e.nombre,
+          contacto_email: e.contacto_email,
+          contacto_telefono: e.contacto_telefono,
+          direccion: e.direccion,
+        })
+        setEmpresaId(e.id!)
       }
     } catch {
       setError('No se pudo cargar el usuario.')
@@ -116,10 +113,7 @@ export default function UserForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setForm(f => ({
-      ...f,
-      [name]: name === 'rol_id' ? Number(value) : value,
-    }))
+    setForm(f => ({ ...f, [name]: name === 'rol_id' ? Number(value) : value }))
   }
 
   const handleEmpresa = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,11 +121,12 @@ export default function UserForm() {
     setEmpresa(prev => ({ ...prev, [name]: value }))
   }
 
+  // 3) Al enviar: crea/actualiza usuario, luego empresa solo si rol=empresa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     // validar contraseñas
-    if (!isEdit || form.contrasena) {
-      if (form.contrasena !== confirmPassword) {
+    if (!isEdit || form.password) {
+      if (form.password !== confirmPassword) {
         setError('Las contraseñas no coinciden.')
         return
       }
@@ -141,7 +136,10 @@ export default function UserForm() {
       const token = localStorage.getItem('token')
       let userId = id
 
-      // POST o PUT usuario
+      // companyRoleId dinámico de state
+      const companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresas')?.id
+
+      // crear o actualizar usuario
       if (isEdit) {
         await axios.put(
           `http://localhost:5001/api/users/${id}`,
@@ -150,14 +148,14 @@ export default function UserForm() {
         )
       } else {
         const res = await axios.post(
-          'http://localhost:5001/api/users',
+          'http://localhost:5001/api/register',
           form,
           { headers: { Authorization: `Bearer ${token}` } }
         )
         userId = String((res.data as any).id)
       }
 
-      // sólo si el rol seleccionado es “empresas”
+      // empresa: sólo si rol=empresa
       if (companyRoleId && form.rol_id === companyRoleId) {
         const payload = {
           nombre: empresa.nombre,
@@ -189,6 +187,9 @@ export default function UserForm() {
 
   if (loading) return <div className="p-8">Cargando…</div>
 
+  // Compute companyRoleId for use in render
+  const companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresas')?.id
+
   return (
     <div className="flex min-h-screen bg-white">
       <AdminNav />
@@ -196,45 +197,23 @@ export default function UserForm() {
         <h1 className="text-2xl font-bold text-gray-900 mb-4">
           {isEdit ? 'Editar Usuario' : 'Crear Usuario'}
         </h1>
-        {error && <p className="mb-4 text-red-500">{error}</p>}
+        {error && <p className="text-red-500 mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
-          {/* Nombre */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre</label>
-            <input
-              name="nombre"
-              value={form.nombre}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
-
-          {/* Apellido */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Apellido</label>
-            <input
-              name="apellido"
-              value={form.apellido}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
-
-          {/* Email */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Email</label>
-            <input
-              name="email"
-              type="email"
-              value={form.email}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
+          {/* Datos básicos */}
+          {['nombre', 'apellido', 'email'].map(field => (
+            <div key={field}>
+              <label className="block mb-1 text-sm font-semibold text-gray-900 capitalize">{field}</label>
+              <input
+                name={field}
+                type={field === 'email' ? 'email' : 'text'}
+                value={(form as any)[field]}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              />
+            </div>
+          ))}
 
           {/* Contraseña */}
           <div>
@@ -242,15 +221,13 @@ export default function UserForm() {
               Contraseña {isEdit && <span className="text-xs">(vacío = sin cambio)</span>}
             </label>
             <input
-              name="contrasena"
+              name="password"
               type="password"
-              value={form.contrasena}
+              value={form.password}
               onChange={handleChange}
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
-
-          {/* Confirmar Contraseña */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-900">Confirmar Contraseña</label>
             <input
@@ -271,63 +248,33 @@ export default function UserForm() {
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             >
               {roles.map(r => (
-                <option key={r.id} value={r.id} className="text-gray-900">
+                <option key={r.id} value={r.id}>
                   {r.nombre.charAt(0).toUpperCase() + r.nombre.slice(1)}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Campos Empresa */}
-          {companyRoleId && form.rol_id === companyRoleId && (
+          {/* Campos de Empresa */}
+          {(roles.length > 0) && form.rol_id === companyRoleId && (
             <>
               <hr className="my-4 border-gray-200" />
               <h2 className="text-lg font-bold text-gray-900 mb-2">Datos de Empresa</h2>
-
-              <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre Empresa</label>
-                <input
-                  name="nombre"
-                  value={empresa.nombre}
-                  onChange={handleEmpresa}
-                  required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">Email de Contacto</label>
-                <input
-                  name="contacto_email"
-                  type="email"
-                  value={empresa.contacto_email}
-                  onChange={handleEmpresa}
-                  required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">Teléfono de Contacto</label>
-                <input
-                  name="contacto_telefono"
-                  value={empresa.contacto_telefono}
-                  onChange={handleEmpresa}
-                  required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-                />
-              </div>
-
-              <div>
-                <label className="block mb-1 text-sm font-semibold text-gray-900">Dirección</label>
-                <input
-                  name="direccion"
-                  value={empresa.direccion}
-                  onChange={handleEmpresa}
-                  required
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-                />
-              </div>
+              {(['nombre', 'contacto_email', 'contacto_telefono', 'direccion'] as (keyof EmpresaData)[]).map(field => (
+                <div key={field}>
+                  <label className="block mb-1 text-sm font-semibold text-gray-900">
+                    {field.replace('_', ' ')}
+                  </label>
+                  <input
+                    name={field}
+                    type={field === 'contacto_email' ? 'email' : 'text'}
+                    value={(empresa as any)[field]}
+                    onChange={handleEmpresa}
+                    required
+                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+                  />
+                </div>
+              ))}
             </>
           )}
 
@@ -335,7 +282,7 @@ export default function UserForm() {
             type="submit"
             className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B]"
           >
-            {isEdit ? 'Guardar cambios' : 'Crear usuario'}
+            {isEdit ? 'Guardar cambios' : 'Crear Usuario'}
           </button>
         </form>
       </main>

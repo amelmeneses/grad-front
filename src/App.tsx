@@ -1,14 +1,18 @@
-// src/App.tsx
-
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './components/LoginPage';
-import AdminDashboard from './components/AdminDashboard';
-import ManageUsers from './components/ManageUsers';
-import UserForm from './components/UserForm';           // ← importa el formulario
-import UserDashboard from './components/UserDashboard';
-import CompanyDashboard from './components/CompanyDashboard';
+
+import LoginPage      from './components/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
-import Forbidden from './components/Forbidden';
+import Forbidden      from './components/Forbidden';
+
+import AdminDashboard  from './components/AdminDashboard';
+import ManageUsers     from './components/ManageUsers';
+import UserForm        from './components/UserForm';
+
+import ManageCompanies from './components/ManageCompanies';
+import CompanyForm     from './components/CompanyForm';
+
+import CompanyDashboard from './components/CompanyDashboard';
+import UserDashboard    from './components/UserDashboard';
 
 function App() {
   return (
@@ -17,7 +21,7 @@ function App() {
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Admin menu */}
+        {/* Admin Dashboard */}
         <Route
           path="/dashboard-admin"
           element={
@@ -27,7 +31,7 @@ function App() {
           }
         />
 
-        {/* Admin → Manage Users */}
+        {/* Admin → Usuarios */}
         <Route
           path="/admin/users"
           element={
@@ -36,8 +40,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Admin → Crear Usuario */}
         <Route
           path="/admin/user"
           element={
@@ -46,8 +48,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Admin → Editar Usuario */}
         <Route
           path="/admin/user/:id"
           element={
@@ -57,11 +57,37 @@ function App() {
           }
         />
 
-        {/* Company & User dashboards */}
+        {/* Admin → Empresas */}
+        <Route
+          path="/admin/empresas"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <ManageCompanies />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/empresa"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <CompanyForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/empresa/:id"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <CompanyForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Company & User Dashboards */}
         <Route
           path="/dashboard-company"
           element={
-            <ProtectedRoute allowedRoles={[2]}>
+            <ProtectedRoute allowedRoles={[3]}>
               <CompanyDashboard />
             </ProtectedRoute>
           }
@@ -69,13 +95,13 @@ function App() {
         <Route
           path="/dashboard-user"
           element={
-            <ProtectedRoute allowedRoles={[3]}>
+            <ProtectedRoute allowedRoles={[2]}>
               <UserDashboard />
             </ProtectedRoute>
           }
         />
 
-        {/* 403 & fallback */}
+        {/* 403 Forbidden & fallback */}
         <Route path="/403" element={<Forbidden />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

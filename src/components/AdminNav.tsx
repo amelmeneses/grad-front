@@ -1,4 +1,3 @@
-// src/components/AdminNav.tsx
 import { Link, useLocation } from 'react-router-dom';
 import { FiGrid, FiUser } from 'react-icons/fi';
 import { MdSportsBasketball } from 'react-icons/md';
@@ -9,8 +8,8 @@ export default function AdminNav() {
 
   const menuItems = [
     { to: '/dashboard-admin', label: 'Dashboard', icon: <FiGrid size={20} /> },
-    { to: '/admin/users', label: 'Usuario', icon: <FiUser size={20} /> },
-    { to: '/admin/courts', label: 'Empresas', icon: <MdSportsBasketball size={20} /> },
+    { to: '/admin/users',    label: 'Usuario',   icon: <FiUser size={20} /> },
+    { to: '/admin/empresas', label: 'Empresas',  icon: <MdSportsBasketball size={20} /> },
   ];
 
   return (
@@ -24,7 +23,7 @@ export default function AdminNav() {
       {/* Menú */}
       <nav className="flex-1">
         <ul className="space-y-4">
-          {menuItems.map((item) => {
+          {menuItems.map(item => {
             const active = location.pathname === item.to;
             return (
               <li key={item.to}>
@@ -32,7 +31,9 @@ export default function AdminNav() {
                   to={item.to}
                   className={
                     `flex items-center p-2 rounded-lg transition-colors ` +
-                    `${active ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100'}`
+                    (active
+                      ? 'bg-blue-100 text-blue-600'
+                      : 'text-gray-700 hover:bg-gray-100')
                   }
                 >
                   <span className="mr-3">{item.icon}</span>

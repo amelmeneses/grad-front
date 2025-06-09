@@ -10,7 +10,7 @@ export default function AdminNav() {
   const menuItems = [
     { to: '/dashboard-admin', label: 'Dashboard', icon: <FiGrid size={20} /> },
     { to: '/admin/users', label: 'Usuario', icon: <FiUser size={20} /> },
-    { to: '/admin/courts', label: 'Canchas', icon: <MdSportsBasketball size={20} /> },
+    { to: '/admin/courts', label: 'Empresas', icon: <MdSportsBasketball size={20} /> },
   ];
 
   return (

@@ -22,16 +22,14 @@ export default function ManageUsers() {
   const [error, setError]     = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // 1) Carga inicial
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const { data } = await axios.get<User[]>(
-        'http://localhost:5001/api/users',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setUsers(data);
+      const res = await axios.get<User[]>('http://localhost:5001/api/users', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(res.data);
       setError(null);
     } catch {
       setError('No se pudieron cargar los usuarios');
@@ -44,40 +42,47 @@ export default function ManageUsers() {
     fetchUsers();
   }, []);
 
-  // 2) Toggle estado -> usa el PUT /api/users/:id
-  const toggleEstado = async (u: User) => {
-    const nuevoEstado = u.estado === 1 ? 0 : 1;
-    const confirmMsg = nuevoEstado === 1
-      ? '¿Está seguro de que desea activar este usuario?'
-      : '¿Está seguro de que desea desactivar este usuario?';
-    if (!window.confirm(confirmMsg)) return;
+  const toggleEstado = async (id: number, currentEstado: number) => {
+    const nuevoEstado = currentEstado === 1 ? 0 : 1;
+    const confirmacion = window.confirm(
+      `¿Está seguro de que desea marcar este usuario como ${
+        nuevoEstado === 1 ? 'Activo' : 'Inactivo'
+      }?`
+    );
+    if (!confirmacion) return;
 
     try {
       const token = localStorage.getItem('token');
-      await axios.put(
-        `http://localhost:5001/api/users/${u.id}`,
-        { estado: nuevoEstado },
+      const url =
+        nuevoEstado === 1
+          ? `http://localhost:5001/api/users/${id}/activar`
+          : `http://localhost:5001/api/users/${id}/desactivar`;
+
+      await axios.patch(
+        url,
+        {}, // sin cuerpo
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      await fetchUsers();
+      fetchUsers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Error al cambiar estado');
+      const msg = err.response?.data?.message || 'Error al cambiar estado';
+      alert(msg);
     }
   };
 
-  // 3) Eliminar usuario
   const handleDelete = async (id: number) => {
-    if (!window.confirm('¿Está seguro que desea eliminar este usuario?')) return;
+    const confirmed = window.confirm('¿Está seguro que desea eliminar este usuario?');
+    if (!confirmed) return;
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(
-        `http://localhost:5001/api/users/delete/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      await fetchUsers();
+      await axios.delete(`http://localhost:5001/api/users/delete/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      fetchUsers();
     } catch (err: any) {
-      alert(err.response?.data?.message || 'Error al eliminar el usuario');
+      const msg = err.response?.data?.message || 'Error al eliminar el usuario';
+      alert(msg);
     }
   };
 
@@ -90,7 +95,7 @@ export default function ManageUsers() {
       <main className="flex-1 p-8">
         <header className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Usuarios</h1>
+            <h1 className="text-2xl font-bold">Usuarios</h1>
             <p className="text-gray-600">Lista de usuarios</p>
           </div>
           <button
@@ -118,14 +123,9 @@ export default function ManageUsers() {
             <tbody>
               {users.map(u => (
                 <tr key={u.id} className="border-b hover:bg-gray-50">
-                  {/* Avatar + nombre */}
                   <td className="flex items-center p-3 space-x-2">
                     {u.avatarUrl ? (
-                      <img
-                        src={u.avatarUrl}
-                        alt={u.nombre}
-                        className="w-8 h-8 rounded-full"
-                      />
+                      <img src={u.avatarUrl} alt={u.nombre} className="w-8 h-8 rounded-full" />
                     ) : (
                       <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600">
                         {u.nombre.charAt(0)}
@@ -133,49 +133,42 @@ export default function ManageUsers() {
                     )}
                     <span className="text-gray-800">{u.nombre}</span>
                   </td>
-
-                  {/* Apellidos */}
                   <td className="p-3 text-gray-800">{u.apellido}</td>
-
-                  {/* Email */}
                   <td className="p-3 text-gray-800">{u.email}</td>
-
-                  {/* Role */}
                   <td className="p-3 text-gray-800">{u.Role.nombre}</td>
-
-                  {/* Estado */}
                   <td className="p-3 text-gray-800">
                     {u.estado === 1 ? (
-                      <span className="inline-block px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">Activo</span>
+                      <span className="inline-block px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
+                        Activo
+                      </span>
                     ) : (
-                      <span className="inline-block px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">Inactivo</span>
+                      <span className="inline-block px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
+                        Inactivo
+                      </span>
                     )}
                   </td>
-
-                  {/* Acciones */}
                   <td className="p-3 text-center space-x-2">
-                    {/* Editar */}
                     <button
                       onClick={() => navigate(`/admin/user/${u.id}`)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >
                       <FaEdit className="text-[#0B91C1]" size={16} />
                     </button>
-
-                    {/* Toggle estado */}
-                    <button
-                      onClick={() => toggleEstado(u)}
-                      className={`
-                        px-3 py-2 rounded-lg transition
-                        ${u.estado === 1
-                          ? 'bg-red-100 text-red-700 border border-red-700 hover:bg-red-200'
-                          : 'bg-green-100 text-green-700 border border-green-700 hover:bg-green-200'}
-                      `}
-                    >
-                      {u.estado === 1 ? 'Desactivar' : 'Activar'}
-                    </button>
-
-                    {/* Eliminar */}
+                    {u.estado === 1 ? (
+                      <button
+                        onClick={() => toggleEstado(u.id, u.estado)}
+                        className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
+                      >
+                        Desactivar
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => toggleEstado(u.id, u.estado)}
+                        className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
+                      >
+                        Activar
+                      </button>
+                    )}
                     <button
                       onClick={() => handleDelete(u.id)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"

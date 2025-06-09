@@ -53,7 +53,7 @@ export default function UserForm() {
   const [error, setError] = useState<string | null>(null);
 
   // ID dinámico del rol “empresa”
-  const companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
+  let companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
 
   // 1) Cargar roles y, si es edición, cargar usuario + empresa
   useEffect(() => {
@@ -63,19 +63,26 @@ export default function UserForm() {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
-        setRoles(res.data);
-        if (isEdit) {
-          loadUser();
+        const fetchedRoles = res.data;
+        setRoles(fetchedRoles);
+        const fetchedCompanyRoleId = fetchedRoles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
+
+        // companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
+        if (isEdit && fetchedCompanyRoleId != null) {
+          loadUser(fetchedCompanyRoleId);
         } else {
           setLoading(false);
         }
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setError('No se pudieron cargar los roles')
+        setLoading(false)
+      })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 2) Si hay id, traer datos del usuario + (si es rol “empresa”) su empresa
-  const loadUser = async () => {
+  const loadUser = async (fetchedCompanyRoleId: number) => {
     try {
       const token = localStorage.getItem('token');
       // Obtener usuario
@@ -83,7 +90,6 @@ export default function UserForm() {
         `http://localhost:5001/api/users/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setForm({
         nombre: u.nombre,
         apellido: u.apellido,
@@ -94,7 +100,7 @@ export default function UserForm() {
       });
 
       // Si es “empresa”, cargar datos de empresa
-      if (u.rol_id === companyRoleId) {
+      if (u.rol_id === fetchedCompanyRoleId) {
         const { data: empresas } = await axios.get<EmpresaData[]>(
           `http://localhost:5001/api/empresas?usuario_id=${id}`,
           { headers: { Authorization: `Bearer ${token}` } }

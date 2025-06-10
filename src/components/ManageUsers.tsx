@@ -149,6 +149,7 @@ export default function ManageUsers() {
                   </td>
                   <td className="p-3 text-center space-x-2">
                     <button
+                      title="Editar Usuario"
                       onClick={() => navigate(`/admin/user/${u.id}`)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >
@@ -156,6 +157,7 @@ export default function ManageUsers() {
                     </button>
                     {u.estado === 1 ? (
                       <button
+                        title="Desactivar Usuario"
                         onClick={() => toggleEstado(u.id, u.estado)}
                         className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
                       >
@@ -163,6 +165,7 @@ export default function ManageUsers() {
                       </button>
                     ) : (
                       <button
+                        title="Activar Usuario"
                         onClick={() => toggleEstado(u.id, u.estado)}
                         className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
                       >
@@ -170,6 +173,7 @@ export default function ManageUsers() {
                       </button>
                     )}
                     <button
+                      title="Eliminar Usuario"
                       onClick={() => handleDelete(u.id)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >

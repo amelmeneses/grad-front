@@ -149,12 +149,14 @@ export default function ManageCompanies() {
                   <td className="p-3 text-gray-800">{renderSportIcons(c.courts)}</td>
                   <td className="p-3 text-center space-x-2">
                     <button
+                      title="Editar Empresa"
                       onClick={() => navigate(`/admin/empresa/${c.id}`)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >
                       <FaEdit className="text-[#0B91C1]" size={16} />
                     </button>
                     <button
+                      title="Eliminar Empresa"
                       onClick={() => handleDelete(c.id)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >

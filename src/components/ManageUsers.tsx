@@ -95,7 +95,7 @@ export default function ManageUsers() {
       <main className="flex-1 p-8">
         <header className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold">Usuarios</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Usuarios</h1>
             <p className="text-gray-600">Lista de usuarios</p>
           </div>
           <button

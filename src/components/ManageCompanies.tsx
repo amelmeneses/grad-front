@@ -3,6 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminNav from './AdminNav';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+import { Goal, Circle } from 'lucide-react';
+
+interface Court {
+  id: number;
+  deporte: string;
+}
 
 interface Company {
   id: number;
@@ -10,7 +16,7 @@ interface Company {
   contacto_email: string;
   contacto_telefono: string;
   direccion: string;
-  usuario_id: number;
+  courts?: Court[];
 }
 
 export default function ManageCompanies() {
@@ -54,8 +60,55 @@ export default function ManageCompanies() {
     }
   };
 
+  const renderSportIcons = (courts?: Court[]) => {
+    if (!Array.isArray(courts)) return <span>0</span>;
+
+    const sportsMap: Record<string, number> = {};
+
+    courts.forEach(court => {
+      const key = (court?.deporte || '').toLowerCase();
+      if (key) {
+        sportsMap[key] = (sportsMap[key] || 0) + 1;
+      }
+    });
+
+    const icons = [];
+
+    for (const [deporte, cantidad] of Object.entries(sportsMap)) {
+      let IconComponent;
+
+      switch (deporte) {
+        case 'fútbol':
+        case 'futbol':
+          IconComponent = Goal;
+          break;
+        case 'básquet':
+        case 'basket':
+        case 'tenis':
+        case 'pádel':
+        case 'padel':
+        case 'voley':
+        case 'voleibol':
+          IconComponent = Circle;
+          break;
+        default:
+          IconComponent = Circle;
+      }
+
+      icons.push(
+        <span key={deporte} className="flex items-center gap-1 mr-2">
+          {Array.from({ length: cantidad }).map((_, i) => (
+            <IconComponent key={i} size={18} />
+          ))}
+        </span>
+      );
+    }
+
+    return icons.length > 0 ? <div className="flex flex-wrap gap-1">{icons}</div> : <span>0</span>;
+  };
+
   if (loading) return <div className="p-8">Cargando empresas…</div>;
-  if (error)   return <div className="p-8 text-red-500">{error}</div>;
+  if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -63,7 +116,7 @@ export default function ManageCompanies() {
       <main className="flex-1 p-8">
         <header className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold">Empresas</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Empresas</h1>
             <p className="text-gray-600">Gestión de empresas</p>
           </div>
           <button
@@ -82,7 +135,7 @@ export default function ManageCompanies() {
                 <th className="p-3">Email Contacto</th>
                 <th className="p-3">Teléfono</th>
                 <th className="p-3">Dirección</th>
-                <th className="p-3">Usuario (ID)</th>
+                <th className="p-3">Canchas</th>
                 <th className="p-3 text-center">Acciones</th>
               </tr>
             </thead>
@@ -93,7 +146,7 @@ export default function ManageCompanies() {
                   <td className="p-3 text-gray-800">{c.contacto_email}</td>
                   <td className="p-3 text-gray-800">{c.contacto_telefono}</td>
                   <td className="p-3 text-gray-800">{c.direccion}</td>
-                  <td className="p-3 text-gray-800">{c.usuario_id}</td>
+                  <td className="p-3 text-gray-800">{renderSportIcons(c.courts)}</td>
                   <td className="p-3 text-center space-x-2">
                     <button
                       onClick={() => navigate(`/admin/company/${c.id}`)}

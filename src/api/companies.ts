@@ -7,7 +7,7 @@ export const updateCompany = async (id: number, company: Company) => (await api.
 export const deleteCompany = async (id: number) => (await api.delete(`/companies/${id}`)).data;
 export const createCompany = async (company: Company) => {
   const token = localStorage.getItem('token');
-  const res = await axios.post('http://localhost:5001/api/empresas', company, {
+  const res = await axios.post('/api/empresas', company, {
     headers: {
       Authorization: `Bearer ${token}`
     }

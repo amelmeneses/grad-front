@@ -22,7 +22,7 @@ const CompanyForm = ({ onCompanyAdded }: { onCompanyAdded: () => void }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    axios.get("http://localhost:5001/api/users", {
+    axios.get("/api/users", {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => {
       const options = res.data.map((u: any) => ({

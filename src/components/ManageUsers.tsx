@@ -26,7 +26,7 @@ export default function ManageUsers() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await axios.get<User[]>('http://localhost:5001/api/users', {
+      const res = await axios.get<User[]>('/api/users', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
@@ -55,8 +55,8 @@ export default function ManageUsers() {
       const token = localStorage.getItem('token');
       const url =
         nuevoEstado === 1
-          ? `http://localhost:5001/api/users/${id}/activar`
-          : `http://localhost:5001/api/users/${id}/desactivar`;
+          ? `/api/users/${id}/activar`
+          : `/api/users/${id}/desactivar`;
 
       await axios.patch(
         url,
@@ -76,7 +76,7 @@ export default function ManageUsers() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5001/api/users/delete/${id}`, {
+      await axios.delete(`/api/users/delete/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchUsers();

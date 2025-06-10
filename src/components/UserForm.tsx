@@ -59,7 +59,7 @@ export default function UserForm() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios
-      .get<Role[]>('http://localhost:5001/api/roles', {
+      .get<Role[]>('/api/roles', {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
@@ -87,7 +87,7 @@ export default function UserForm() {
       const token = localStorage.getItem('token');
       // Obtener usuario
       const { data: u } = await axios.get<any>(
-        `http://localhost:5001/api/users/${id}`,
+        `/api/users/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setForm({
@@ -102,7 +102,7 @@ export default function UserForm() {
       // Si es “empresa”, cargar datos de empresa
       if (u.rol_id === fetchedCompanyRoleId) {
         const { data: empresas } = await axios.get<EmpresaData[]>(
-          `http://localhost:5001/api/empresas?usuario_id=${id}`,
+          `/api/empresas?usuario_id=${id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         if (empresas.length) {
@@ -159,7 +159,7 @@ export default function UserForm() {
       // Crear o actualizar usuario
       if (isEdit) {
         await axios.put(
-          `http://localhost:5001/api/users/${id}`,
+          `/api/users/${id}`,
           {
             nombre: form.nombre,
             apellido: form.apellido,
@@ -173,7 +173,7 @@ export default function UserForm() {
       } else {
         // Nota: el endpoint de registro puede ser /api/register
         const res = await axios.post(
-          'http://localhost:5001/api/register',
+          '/api/register',
           {
             nombre: form.nombre,
             apellido: form.apellido,
@@ -199,14 +199,14 @@ export default function UserForm() {
         if (empresaId) {
           // Actualizar empresa existente
           await axios.put(
-            `http://localhost:5001/api/empresas/${empresaId}`,
+            `/api/empresas/${empresaId}`,
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );
         } else {
           // Crear nueva empresa
           await axios.post(
-            'http://localhost:5001/api/empresas',
+            '/api/empresas',
             payload,
             { headers: { Authorization: `Bearer ${token}` } }
           );

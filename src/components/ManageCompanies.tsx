@@ -31,7 +31,7 @@ export default function ManageCompanies() {
       setLoading(true);
       const token = localStorage.getItem('token');
       const res = await axios.get<Company[]>(
-        'http://localhost:5001/api/empresas',
+        '/api/empresas',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCompanies(res.data);
@@ -52,7 +52,7 @@ export default function ManageCompanies() {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(
-        `http://localhost:5001/api/empresas/${id}`,
+        `/api/empresas/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchCompanies();

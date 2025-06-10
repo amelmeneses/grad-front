@@ -23,7 +23,7 @@ export default function ManageCourts() {
 
     // 1) Nombre de la empresa
     axios
-      .get<Company>(`http://localhost:5001/api/empresas/${empresaId}`, {
+      .get<Company>(`/api/empresas/${empresaId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => setCompanyName(res.data.nombre))
@@ -31,7 +31,7 @@ export default function ManageCourts() {
 
     // 2) Lista de canchas
     axios
-      .get<Court[]>(`http://localhost:5001/api/canchas?company_id=${empresaId}`, {
+      .get<Court[]>(`/api/canchas?company_id=${empresaId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
@@ -109,7 +109,7 @@ export default function ManageCourts() {
                           try {
                             const token = localStorage.getItem('token');
                             await axios.delete(
-                              `http://localhost:5001/api/canchas/${court.id}`,
+                              `/api/canchas/${court.id}`,
                               { headers: { Authorization: `Bearer ${token}` } }
                             );
                             setCourts(prev => prev.filter(c => c.id !== court.id));

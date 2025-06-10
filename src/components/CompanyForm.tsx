@@ -38,7 +38,7 @@ export default function CompanyForm() {
   // 1) Cargar lista de usuarios con rol “empresa”
   useEffect(() => {
     const token = localStorage.getItem('token');
-    axios.get<User[]>('http://localhost:5001/api/users', {
+    axios.get<User[]>('/api/users', {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then(res => {
@@ -49,7 +49,7 @@ export default function CompanyForm() {
 
     if (isEdit) {
       // 2) Cargar empresa existente
-      axios.get<EmpresaData[]>(`http://localhost:5001/api/empresas`, {
+      axios.get<EmpresaData[]>(`/api/empresas`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
@@ -81,13 +81,13 @@ export default function CompanyForm() {
       const token = localStorage.getItem('token');
       if (isEdit) {
         await axios.put(
-          `http://localhost:5001/api/empresas/${id}`,
+          `/api/empresas/${id}`,
           form,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          'http://localhost:5001/api/empresas',
+          '/api/empresas',
           form,
           { headers: { Authorization: `Bearer ${token}` } }
         );

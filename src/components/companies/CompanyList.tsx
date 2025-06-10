@@ -20,7 +20,7 @@ export default function CompanyList() {
   const [companies, setCompanies] = useState<Company[]>([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5001/api/empresas')
+    axios.get('/api/empresas')
       .then(res => setCompanies(res.data))
       .catch(err => console.error(err));
   }, []);

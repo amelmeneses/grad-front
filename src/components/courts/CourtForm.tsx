@@ -32,7 +32,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ onCourtAdded }) => {
     }
     const token = localStorage.getItem('token');
     axios
-      .get<Court>(`http://localhost:5001/api/canchas/${id}`, {
+      .get<Court>(`/api/canchas/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => setForm(res.data as Omit<Court, 'id'>))
@@ -59,13 +59,13 @@ const CourtForm: React.FC<CourtFormProps> = ({ onCourtAdded }) => {
       const token = localStorage.getItem('token');
       if (isEdit) {
         await axios.put(
-          `http://localhost:5001/api/canchas/${id}`,
+          `/api/canchas/${id}`,
           form,
           { headers: { Authorization: `Bearer ${token}` } }
         );
       } else {
         await axios.post(
-          'http://localhost:5001/api/canchas',
+          '/api/canchas',
           form,
           { headers: { Authorization: `Bearer ${token}` } }
         );

@@ -24,7 +24,7 @@ const LoginPage = () => {
     e.preventDefault();
     setError(null);
     try {
-      const { data } = await axios.post('http://localhost:5001/api/login', { email, password });
+      const { data } = await axios.post('/api/login', { email, password });
       const payload: TokenPayload = jwtDecode<TokenPayload>(data.token);
       localStorage.setItem('token', data.token);
 

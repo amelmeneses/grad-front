@@ -4,6 +4,7 @@ import axios from 'axios';
 import AdminNav from './AdminNav';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Goal, Circle } from 'lucide-react';
+import { TbSoccerField } from 'react-icons/tb'; // Ícono para ver canchas
 
 interface Court {
   id: number;
@@ -161,6 +162,13 @@ export default function ManageCompanies() {
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >
                       <FaTrash className="text-red-500" size={16} />
+                    </button>
+                    <button
+                      title="Manejar Canchas"
+                      onClick={() => navigate(`/admin/canchas/${c.id}`)}
+                      className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                    >
+                      <TbSoccerField className="text-green-600" size={18} />
                     </button>
                   </td>
                 </tr>

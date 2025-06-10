@@ -4,4 +4,5 @@ export interface Company {
     email: string;
     phone: string;
     location: string;
+    usuario_id: number;
   }

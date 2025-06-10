@@ -10,6 +10,8 @@ import UserForm        from './components/UserForm';
 
 import ManageCompanies from './components/ManageCompanies';
 import CompanyForm     from './components/CompanyForm';
+import ManageCourts    from './components/ManageCourts';
+import CourtForm       from './components/courts/CourtForm';
 
 import CompanyDashboard from './components/CompanyDashboard';
 import UserDashboard    from './components/UserDashboard';
@@ -79,6 +81,32 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={[1]}>
               <CompanyForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin → Canchas */}
+        <Route
+          path="/admin/canchas/:empresaId"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <ManageCourts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/canchas/:empresaId/new"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <CourtForm onCourtAdded={() => { /* refrescar lista si quieres */ }} />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/canchas/:empresaId/:id"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <CourtForm />
             </ProtectedRoute>
           }
         />

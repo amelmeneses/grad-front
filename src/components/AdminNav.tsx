@@ -2,7 +2,7 @@
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiGrid, FiUser, FiLogOut } from 'react-icons/fi';
-import { MdSportsBasketball } from 'react-icons/md';
+import { MdSportsBasketball, MdOutlineStadium } from 'react-icons/md'; // ícono para canchas
 import logo from '../assets/logop.svg';
 
 export default function AdminNav() {
@@ -10,9 +10,10 @@ export default function AdminNav() {
   const navigate = useNavigate();
 
   const menuItems = [
-    { to: '/dashboard-admin', label: 'Dashboard', icon: <FiGrid size={20} /> },
-    { to: '/admin/users',    label: 'Usuarios', icon: <FiUser size={20} /> },
-    { to: '/admin/empresas', label: 'Empresas', icon: <MdSportsBasketball size={20} /> },
+    { to: '/dashboard-admin',  label: 'Dashboard', icon: <FiGrid size={20} /> },
+    { to: '/admin/users',      label: 'Usuarios',  icon: <FiUser size={20} /> },
+    { to: '/admin/empresas',   label: 'Empresas',  icon: <MdSportsBasketball size={20} /> },
+    { to: '/admin/canchas',    label: 'Canchas',   icon: <MdOutlineStadium size={20} /> }, // Nueva sección
   ];
 
   const handleLogout = () => {

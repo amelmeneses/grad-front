@@ -120,7 +120,7 @@ export default function ManageCompanies() {
             <p className="text-gray-600">Gestión de empresas</p>
           </div>
           <button
-            onClick={() => navigate('/admin/company')}
+            onClick={() => navigate('/admin/empresa')}
             className="px-5 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white font-medium rounded-lg shadow-lg hover:opacity-90 transition"
           >
             Añadir Empresa
@@ -149,7 +149,7 @@ export default function ManageCompanies() {
                   <td className="p-3 text-gray-800">{renderSportIcons(c.courts)}</td>
                   <td className="p-3 text-center space-x-2">
                     <button
-                      onClick={() => navigate(`/admin/company/${c.id}`)}
+                      onClick={() => navigate(`/admin/empresa/${c.id}`)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >
                       <FaEdit className="text-[#0B91C1]" size={16} />

@@ -92,7 +92,7 @@ export default function CompanyForm() {
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
-      navigate('/admin/companies');
+      navigate('/admin/empresas');
     } catch {
       setError('Error al guardar la empresa');
     }
@@ -118,7 +118,7 @@ export default function CompanyForm() {
               value={form.nombre}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
@@ -131,7 +131,7 @@ export default function CompanyForm() {
               value={form.contacto_email}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
@@ -143,7 +143,7 @@ export default function CompanyForm() {
               value={form.contacto_telefono}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
@@ -155,7 +155,7 @@ export default function CompanyForm() {
               value={form.direccion}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
 
@@ -167,7 +167,7 @@ export default function CompanyForm() {
               value={form.usuario_id}
               onChange={handleChange}
               required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             >
               <option value="">Selecciona un usuario</option>
               {users.map(u => (
@@ -180,7 +180,7 @@ export default function CompanyForm() {
 
           <button
             type="submit"
-            className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B]"
+            className="w-full py-3 text-white font-medium rounded-lg text-gray-900 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]"
           >
             {isEdit ? 'Guardar Cambios' : 'Crear Empresa'}
           </button>

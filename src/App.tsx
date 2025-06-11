@@ -17,11 +17,18 @@ import SelectCompanyForCourts from './components/SelectCompanyForCourts';
 import CompanyDashboard from './components/CompanyDashboard';
 import UserDashboard    from './components/UserDashboard';
 
+import LandingPage from './pages/LandingPage';
+
+
+
+
+
 function App() {
   return (
     <Router>
       <Routes>
         {/* Public */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
 
         {/* Admin Dashboard */}

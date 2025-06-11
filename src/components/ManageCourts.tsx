@@ -71,7 +71,6 @@ export default function ManageCourts() {
                 <th className="p-3 text-left">Nombre</th>
                 <th className="p-3 text-left">Descripción</th>
                 <th className="p-3 text-left">Precio/Hora</th>
-                <th className="p-3 text-left">Tipo Deporte</th>
                 <th className="p-3 text-left">Deporte</th>
                 <th className="p-3 text-left">Ubicación</th>
                 <th className="p-3 text-center">Acciones</th>
@@ -88,12 +87,11 @@ export default function ManageCourts() {
                 courts.map(court => (
                   <tr key={court.id} className="border-b hover:bg-gray-50">
                     <td className="p-3 text-gray-800">{court.id}</td>
-                    <td className="p-3 text-gray-800">{court.name}</td>
-                    <td className="p-3 text-gray-800">{court.description}</td>
-                    <td className="p-3 text-gray-800">{court.price_per_hour}</td>
-                    <td className="p-3 text-gray-800">{court.sport_type}</td>
+                    <td className="p-3 text-gray-800">{court.nombre}</td>
+                    <td className="p-3 text-gray-800">{court.descripcion}</td>
+                    <td className="p-3 text-gray-800">aqui va texto quemado</td>
                     <td className="p-3 text-gray-800">{court.deporte}</td>
-                    <td className="p-3 text-gray-800">{court.location}</td>
+                    <td className="p-3 text-gray-800">{court.ubicacion}</td>
                     <td className="p-3 text-center space-x-2">
                       <button
                         title="Editar Cancha"

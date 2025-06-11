@@ -12,6 +12,7 @@ import ManageCompanies from './components/ManageCompanies';
 import CompanyForm     from './components/CompanyForm';
 import ManageCourts    from './components/ManageCourts';
 import CourtForm       from './components/courts/CourtForm';
+import SelectCompanyForCourts from './components/SelectCompanyForCourts';
 
 import CompanyDashboard from './components/CompanyDashboard';
 import UserDashboard    from './components/UserDashboard';
@@ -86,6 +87,14 @@ function App() {
         />
 
         {/* Admin → Canchas */}
+        <Route
+          path="/admin/canchas"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <SelectCompanyForCourts />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/admin/canchas/:empresaId"
           element={

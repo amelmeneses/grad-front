@@ -19,7 +19,12 @@ interface User {
   rol_id: number;
 }
 
-export default function CompanyForm() {
+// 1) Definimos la interfaz de props
+interface CompanyFormProps {
+  onCompanyAdded?: () => void;
+}
+
+export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -93,6 +98,13 @@ export default function CompanyForm() {
         );
       }
       navigate('/admin/empresas');
+      // 2) Si pasaron onCompanyAdded, lo llamamos para refrescar el Dashboard
+      if (onCompanyAdded) {
+        onCompanyAdded();
+        // opcional: limpiar form aquí
+      } else {
+        navigate('/admin/empresas');
+      }
     } catch {
       setError('Error al guardar la empresa');
     }

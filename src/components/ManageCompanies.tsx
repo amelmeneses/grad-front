@@ -1,10 +1,18 @@
+// src/components/ManageCompanies.tsx
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminNav from './AdminNav';
-import { FaEdit, FaTrash } from 'react-icons/fa';
-import { Goal, Circle } from 'lucide-react';
-import { TbSoccerField } from 'react-icons/tb'; // Ícono para ver canchas
+import {
+  FaEdit,
+  FaTrash,
+  FaFutbol,
+  FaBasketballBall,
+  FaTableTennis
+} from 'react-icons/fa';
+import { GiTennisBall } from 'react-icons/gi';
+import { TbSoccerField } from 'react-icons/tb';
 
 interface Court {
   id: number;
@@ -51,10 +59,7 @@ export default function ManageCompanies() {
     if (!window.confirm('¿Está seguro que desea eliminar esta empresa?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(
-        `/api/empresas/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.delete(`/api/empresas/${id}`, { headers: { Authorization: `Bearer ${token}` } });
       fetchCompanies();
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error al eliminar la empresa');
@@ -62,54 +67,51 @@ export default function ManageCompanies() {
   };
 
   const renderSportIcons = (courts?: Court[]) => {
-    if (!Array.isArray(courts)) return <span>0</span>;
+    if (!Array.isArray(courts) || courts.length === 0) return <span>0</span>;
 
-    const sportsMap: Record<string, number> = {};
+    // Count only the four supported sports
+    const counts: Record<string, number> = { futbol: 0, basket: 0, tenis: 0, padel: 0 };
+    courts.forEach(c => {
+      const key = c.deporte.toLowerCase();
+      if (key in counts) counts[key]++;
+    });
 
-    courts.forEach(court => {
-      const key = (court?.deporte || '').toLowerCase();
-      if (key) {
-        sportsMap[key] = (sportsMap[key] || 0) + 1;
+    const icons: React.ReactNode[] = [];
+    Object.entries(counts).forEach(([sport, qty]) => {
+      let IconComp: React.ComponentType<any>;
+      let colorClass = '';
+      switch (sport) {
+        case 'futbol':
+          IconComp = FaFutbol;
+          colorClass = ''; // leave default black/white
+          break;
+        case 'basket':
+          IconComp = FaBasketballBall;
+          colorClass = 'text-red-700'; // dark tomato
+          break;
+        case 'tenis':
+          IconComp = GiTennisBall;
+          colorClass = 'text-green-300'; // light green
+          break;
+        case 'padel':
+          IconComp = FaTableTennis;
+          colorClass = 'text-blue-300'; // light blue
+          break;
+        default:
+          return;
+      }
+      for (let i = 0; i < qty; i++) {
+        icons.push(
+          <IconComp key={`${sport}-${i}`} className={`text-xl mr-1 ${colorClass}`} />
+        );
       }
     });
 
-    const icons = [];
-
-    for (const [deporte, cantidad] of Object.entries(sportsMap)) {
-      let IconComponent;
-
-      switch (deporte) {
-        case 'fútbol':
-        case 'futbol':
-          IconComponent = Goal;
-          break;
-        case 'básquet':
-        case 'basket':
-        case 'tenis':
-        case 'pádel':
-        case 'padel':
-        case 'voley':
-        case 'voleibol':
-          IconComponent = Circle;
-          break;
-        default:
-          IconComponent = Circle;
-      }
-
-      icons.push(
-        <span key={deporte} className="flex items-center gap-1 mr-2">
-          {Array.from({ length: cantidad }).map((_, i) => (
-            <IconComponent key={i} size={18} />
-          ))}
-        </span>
-      );
-    }
-
-    return icons.length > 0 ? <div className="flex flex-wrap gap-1">{icons}</div> : <span>0</span>;
+    return <div className="flex items-center">{icons.length ? icons : <span>0</span>}</div>;
   };
 
   if (loading) return <div className="p-8">Cargando empresas…</div>;
-  if (error) return <div className="p-8 text-red-500">{error}</div>;
+  if (error)   return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="flex min-h-screen bg-white">

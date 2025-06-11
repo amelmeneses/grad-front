@@ -1,26 +1,26 @@
+// src/components/courts/CourtForm.tsx
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate }        from 'react-router-dom';
 import axios                              from 'axios';
 import AdminNav                           from '../AdminNav';
-import { Court }                          from '../../interfaces/Court'; // <- ruta corregida
+import { Court }                         from '../../interfaces/Court';
 
 interface CourtFormProps {
   onCourtAdded?: () => void;
 }
 
-const CourtForm: React.FC<CourtFormProps> = ({ onCourtAdded }) => {
+const CourtForm: React.FC<CourtFormProps> = ({ }) => {
   const { empresaId, id } = useParams<{ empresaId: string; id?: string }>();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
   const [form, setForm] = useState<Omit<Court, 'id'>>({
-    name: '',
-    description: '',
-    price_per_hour: 0,
-    sport_type: '',
-    location: '',
+    nombre: '',
+    descripcion: '',
+    ubicacion: '',
     deporte: '',
-    company_id: Number(empresaId),
+    empresa_id: Number(empresaId),
   });
   const [loading, setLoading] = useState(isEdit);
   const [error, setError] = useState<string | null>(null);
@@ -46,15 +46,13 @@ const CourtForm: React.FC<CourtFormProps> = ({ onCourtAdded }) => {
     const { name, value } = e.target;
     setForm(prev => ({
       ...prev,
-      [name]:
-        name === 'price_per_hour' || name === 'company_id'
-          ? Number(value)
-          : value,
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submitting form payload:', form); // <-- comprueba aquí
     try {
       const token = localStorage.getItem('token');
       if (isEdit) {
@@ -70,8 +68,8 @@ const CourtForm: React.FC<CourtFormProps> = ({ onCourtAdded }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
-      if (onCourtAdded) onCourtAdded();
-      else navigate(`/admin/canchas/${empresaId}`);
+      // Redirige siempre a la lista de canchas de la empresa
+      navigate(`/admin/canchas/${empresaId}`);
     } catch {
       setError('Error al guardar la cancha');
     }
@@ -90,73 +88,56 @@ const CourtForm: React.FC<CourtFormProps> = ({ onCourtAdded }) => {
 
         <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
           <div>
-            <label className="block mb-1 font-medium">Nombre</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre</label>
             <input
-              type="text"
-              name="name"
-              value={form.name}
+              name="nombre"
+              value={form.nombre}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
               required
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
           <div>
-            <label className="block mb-1 font-medium">Descripción</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Descripción</label>
             <input
-              type="text"
-              name="description"
-              value={form.description}
+              name="descripcion"
+              value={form.descripcion}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
           <div>
-            <label className="block mb-1 font-medium">Precio por hora</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">
+              Ubicación y referencia
+            </label>
             <input
-              type="number"
-              name="price_per_hour"
-              value={form.price_per_hour}
+              name="ubicacion"
+              value={form.ubicacion}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-              required
-              min={0}
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
           <div>
-            <label className="block mb-1 font-medium">Tipo de deporte</label>
-            <input
-              type="text"
-              name="sport_type"
-              value={form.sport_type}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Ubicación</label>
-            <input
-              type="text"
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 font-medium">Deporte</label>
-            <input
-              type="text"
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Deporte</label>
+            <select
               name="deporte"
               value={form.deporte}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
-            />
+              required
+              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+            >
+              <option value="">Selecciona un deporte</option>
+              <option value="futbol">Fútbol</option>
+              <option value="basket">Básquet</option>
+              <option value="tenis">Tenis</option>
+              <option value="padel">Pádel</option>
+            </select>
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B] hover:opacity-90 transition"
           >
-            {isEdit ? 'Actualizar' : 'Crear'}
+            {isEdit ? 'Guardar Cambios' : 'Crear Cancha'}
           </button>
         </form>
       </main>

@@ -1,8 +1,9 @@
+// src/interfaces/Company.ts
+
 export interface Company {
-    id?: number;
-    name: string;
-    email: string;
-    phone: string;
-    location: string;
-    usuario_id: number;
-  }
+  id: number;
+  nombre: string;
+  contacto_email: string;
+  contacto_telefono: string;
+  direccion: string;
+}

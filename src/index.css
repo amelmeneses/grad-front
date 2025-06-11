@@ -15,14 +15,14 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
+/* a {
   font-weight: 500;
   color: #646cff;
   text-decoration: inherit;
 }
 a:hover {
   color: #535bf2;
-}
+} */
 
 body {
   margin: 0;
@@ -37,7 +37,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+/* button {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -53,10 +53,10 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
-}
+} */
 
 @media (prefers-color-scheme: light) {
-  :root {
+  /* :root {
     color: #213547;
     background-color: #ffffff;
   }
@@ -65,10 +65,57 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
-  }
+  } */
 }
 
 #root {
   flex: 1 1 auto;
   width: 100%;
+}
+
+/* Estilos base para las 3 líneas del hamburguesa */
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background-color: #000;
+  border-radius: 1px;
+  transition: transform 0.3s, opacity 0.3s;
+  margin: 2px 0; /* Ajusta el espacio vertical inicial */
+}
+/* Base de las 3 líneas del icono */
+.hamburger span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin: 4px 0;           /* separa las líneas cuando está cerrado */
+  background-color: #000;
+  border-radius: 1px;
+  transform-origin: center center;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Línea central desaparece al abrir */
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+/* Primera línea: gira +45º */
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translateY(0);  /* 45° sin desvíos verticales */
+  position: relative;
+  top: 6px;
+}
+
+/* Tercera línea: gira -45º */
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translateY(0);
+  position: relative;
+  top: -6px;
+}
+
+/* Asegura que el botón siempre quede encima del menú */
+.hamburger {
+  position: relative;
+  z-index: 60;
 }

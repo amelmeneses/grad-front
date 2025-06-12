@@ -5,10 +5,9 @@ import logo from '../assets/logo_menu.svg';
 
 const links = [
   { to: '/', label: 'Home' },
-  { to: '/about', label: 'About Us' },
+  { to: '/about-as', label: 'About Us' },
   { to: '/reservas', label: 'Reservas' },
   { to: '/servicios', label: 'Servicios' },
-  { to: '/gift-cards', label: 'Gift Cards' },
   { to: '/ayuda', label: 'Ayuda' },
 ];
 

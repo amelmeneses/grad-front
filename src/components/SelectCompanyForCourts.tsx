@@ -67,17 +67,17 @@ export default function SelectCompanyForCourts() {
     navigate(`/admin/canchas/${selected.value}`);
   };
 
-  if (loading) return <div className="p-8 text-gray-700">Loading companies…</div>;
+  if (loading) return <div className="p-8 text-gray-700">Cargando empresas…</div>;
   if (error)   return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="flex min-h-screen bg-white">
       <AdminNav />
       <main className="flex-1 p-8 max-w-md mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Select Company</h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Selecciona la Empresa</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block mb-1 text-sm font-medium text-gray-700">Company</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">Empresa</label>
             <Select
               options={options}
               value={selected}

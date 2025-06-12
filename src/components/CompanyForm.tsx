@@ -136,7 +136,7 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
 
           {/* Email contacto */}
           <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Email de Contacto</label>
+            <label className="block mb-1 text-sm font-semibold text-gray-900">Correo de Contacto</label>
             <input
               name="contacto_email"
               type="email"

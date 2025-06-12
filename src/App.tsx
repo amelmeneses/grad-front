@@ -18,6 +18,11 @@ import CompanyDashboard from './components/CompanyDashboard';
 import UserDashboard    from './components/UserDashboard';
 
 import LandingPage from './pages/LandingPage';
+import AboutAs from './pages/AboutAs';
+import ServicesSection from './components/ServicesSection'
+import HelpSection from './components/HelpSection';
+
+
 
 
 
@@ -30,6 +35,11 @@ function App() {
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/about-as" element={<AboutAs />} />
+        <Route path="/servicios" element={<ServicesSection />} /> 
+        <Route path="/ayuda" element={<HelpSection />} />
+
+        {/* Protected Routes */}
 
         {/* Admin Dashboard */}
         <Route

@@ -80,7 +80,7 @@ export default function CompanyList() {
           <tr>
             <th className="p-3 border">Nombre</th>
             <th className="p-3 border">Dirección</th>
-            <th className="p-3 border">Email</th>
+            <th className="p-3 border">Correo electrónico</th>
             <th className="p-3 border">Teléfono</th>
             <th className="p-3 border">Canchas</th>
           </tr>

@@ -1,7 +1,7 @@
 // src/components/ServicesSection.tsx
 
-import AdminNav from './Navbar';
-import Footer from './Footer';
+import AdminNav from '../components/Navbar';
+import Footer from '../components/Footer';
 import {
   TbArrowRightCircle,
   TbSoccerField,

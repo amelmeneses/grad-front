@@ -1,7 +1,7 @@
 // src/components/HelpSection.tsx
-import AdminNav from './Navbar';
+import AdminNav from '../components/Navbar';
 import { FiPhone, FiMail, FiMapPin } from 'react-icons/fi';
-import Footer from './Footer';
+import Footer from '../components/Footer';
 
 export default function HelpSection() {
   return (

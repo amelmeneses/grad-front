@@ -1,3 +1,4 @@
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import LoginPage      from './components/LoginPage';
@@ -10,23 +11,19 @@ import UserForm        from './components/UserForm';
 
 import ManageCompanies from './components/ManageCompanies';
 import CompanyForm     from './components/CompanyForm';
+import SelectCompanyForCourts from './components/SelectCompanyForCourts';
 import ManageCourts    from './components/ManageCourts';
 import CourtForm       from './components/courts/CourtForm';
-import SelectCompanyForCourts from './components/SelectCompanyForCourts';
 
 import CompanyDashboard from './components/CompanyDashboard';
 import UserDashboard    from './components/UserDashboard';
 
-import LandingPage from './pages/LandingPage';
-import AboutAs from './pages/AboutAs';
-import ServicesSection from './components/ServicesSection'
-import HelpSection from './components/HelpSection';
-
-
-
-
-
-
+import LandingPage     from './pages/LandingPage';
+import AboutAs         from './pages/AboutAs';
+import ServicesSection from './pages/ServicesSection';
+import HelpSection     from './pages/HelpSection';
+import TermsPage       from './pages/TermsAndConditions';
+import PrivacyPolicy   from './pages/PrivacyPolicy';
 
 function App() {
   return (
@@ -36,12 +33,17 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/about-as" element={<AboutAs />} />
-        <Route path="/servicios" element={<ServicesSection />} /> 
+        <Route path="/servicios" element={<ServicesSection />} />
         <Route path="/ayuda" element={<HelpSection />} />
+        <Route path="/terminos" element={<TermsPage />} />
+        <Route path="/politica" element={<PrivacyPolicy />} />
 
-        {/* Protected Routes */}
+        {/* Footer redirects */}
+        <Route path="/reservas" element={<Navigate to="/login" replace />} />
+        <Route path="/perfil"  element={<Navigate to="/login" replace />} />
+        <Route path="/contacto" element={<Navigate to="/ayuda" replace />} />
 
-        {/* Admin Dashboard */}
+        {/* Protected — Admin */}
         <Route
           path="/dashboard-admin"
           element={
@@ -50,8 +52,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Admin → Usuarios */}
         <Route
           path="/admin/users"
           element={
@@ -77,7 +77,6 @@ function App() {
           }
         />
 
-        {/* Admin → Empresas */}
         <Route
           path="/admin/empresas"
           element={
@@ -103,7 +102,6 @@ function App() {
           }
         />
 
-        {/* Admin → Canchas */}
         <Route
           path="/admin/canchas"
           element={
@@ -124,7 +122,7 @@ function App() {
           path="/admin/canchas/:empresaId/new"
           element={
             <ProtectedRoute allowedRoles={[1]}>
-              <CourtForm onCourtAdded={() => { /* refrescar lista si quieres */ }} />
+              <CourtForm />
             </ProtectedRoute>
           }
         />
@@ -137,7 +135,7 @@ function App() {
           }
         />
 
-        {/* Company & User Dashboards */}
+        {/* Protected — Company & User */}
         <Route
           path="/dashboard-company"
           element={
@@ -155,7 +153,7 @@ function App() {
           }
         />
 
-        {/* 403 Forbidden & fallback */}
+        {/* 403 & fallback */}
         <Route path="/403" element={<Forbidden />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

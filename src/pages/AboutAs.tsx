@@ -1,6 +1,7 @@
 // src/pages/AboutAs.tsx
 
 import AdminNav from '../components/Navbar';
+import Footer               from '../components/Footer';
 
 const AboutAs = () => {
   return (
@@ -21,7 +22,7 @@ const AboutAs = () => {
         {/* Nuestra Misión */}
         <section className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Nuestra Misión</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Nuestra Misión</h2>
             <div className="space-y-4 text-gray-700">
               <p>
                 <span className="font-semibold text-[#075F92]">Deportes Accesibles:</span>{' '}
@@ -44,74 +45,43 @@ const AboutAs = () => {
           </div>
           <div className="flex justify-center">
             <img
-              src="src/assets/AboutAs1.jpg"
+              src="/src/assets/AboutAs.jpg"
               alt="Nuestra Misión"
               className="w-80 h-80 rounded-full object-cover shadow-lg"
             />
           </div>
         </section>
 
-        {/* Nuestro Enfoque */}
+        {/* Nuestra Visión */}
         <section className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="order-last md:order-first flex justify-center">
+          <div className="flex justify-center md:order-last">
             <img
-              src="src/assets/AboutAs2.jpg"
-              alt="Nuestro Enfoque"
+              src="/src/assets/AboutAs2.jpg"
+              alt="Nuestra Visión"
               className="w-80 h-80 rounded-full object-cover shadow-lg"
             />
           </div>
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Nuestro Enfoque</h2>
+            <h2 className="text-3xl font-bold text-gray-900">Nuestra Visión</h2>
             <div className="space-y-4 text-gray-700">
               <p>
-                <span className="font-semibold text-[#075F92]">Facilidad para Todos:</span>{' '}
-                Proveemos una plataforma intuitiva que permite a jugadores, organizadores y empresas gestionar
-                sus reservas en pocos pasos y sin complicaciones.
+                En PlayBooker visualizamos un futuro donde cualquier amante del deporte,
+                sin importar su experiencia o ubicación, pueda acceder a instalaciones de
+                primera, reservar con un par de clics y disfrutar de una comunidad global
+                de jugadores conectados.
               </p>
               <p>
-                <span className="font-semibold text-[#0B91C1]">Servicios Personalizados:</span>{' '}
-                Nos enfocamos en brindar servicios adicionales como alquiler de equipamiento, árbitros y grabaciones,
-                diseñados para enriquecer cada experiencia deportiva.
-              </p>
-              <p>
-                <span className="font-semibold text-[#EB752B]">Compromiso con la Excelencia:</span>{' '}
-                Adaptamos un enfoque orientado a satisfacer las necesidades específicas de nuestros usuarios,
-                asegurando calidad en cada interacción y adaptándonos a sus requerimientos.
+                Queremos ser la plataforma líder en innovación deportiva, integrando herramientas
+                de análisis, recomendaciones personalizadas y eventos virtuales que transformen
+                la forma de vivir el deporte.
               </p>
             </div>
           </div>
         </section>
-
-        {/* Nuestro Proceso */}
-        <section className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <h2 className="text-3xl font-bold">Nuestro Proceso</h2>
-            <ol className="list-decimal list-inside space-y-4 text-gray-700">
-              <li>
-                <span className="font-semibold text-[#075F92]">Encuentra tu Espacio Deportivo:</span>{' '}
-                Selecciona tu deporte favorito, explora las canchas disponibles y elige la que mejor se adapte a tus necesidades.
-              </li>
-              <li>
-                <span className="font-semibold text-[#0B91C1]">Personaliza tu Experiencia:</span>{' '}
-                Agrega servicios como iluminación, chalecos o grabaciones para mejorar tu tiempo en la cancha.
-              </li>
-              <li>
-                <span className="font-semibold text-[#EB752B]">Juega sin Preocupaciones:</span>{' '}
-                Completa tu reserva y disfruta de una experiencia deportiva sin contratiempos con PlayBooker.
-              </li>
-            </ol>
-          </div>
-          <div className="flex justify-center">
-            <img
-              src="src/assets/AboutAs3.jpg"
-              alt="Nuestro Proceso"
-              className="w-80 h-80 rounded-full  object-cover shadow-lg"
-            />
-          </div>
-        </section>
       </main>
+       <Footer />
     </div>
-);
+  );
 };
 
 export default AboutAs;

@@ -166,7 +166,7 @@ export default function ManageCompanies() {
                       <FaTrash className="text-red-500" size={16} />
                     </button>
                     <button
-                      title="Manejar Canchas"
+                      title="Detalle Canchas"
                       onClick={() => navigate(`/admin/canchas/${c.id}`)}
                       className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                     >

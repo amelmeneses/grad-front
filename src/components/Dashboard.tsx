@@ -7,8 +7,6 @@ import CompanyForm     from '../components/CompanyForm';
 import CompanyList     from '../components/companies/CompanyList';
 import ManageCourts    from '../components/ManageCourts';    // ← Import corregido
 import CourtForm       from '../components/courts/CourtForm';
-import ServiceForm     from '../components/services/ServiceForm';
-import ServiceList     from '../components/services/ServiceList';
 import ReservationForm from '../components/reservations/ReservationForm';
 import ReservationList from '../components/reservations/ReservationList';
 
@@ -31,10 +29,6 @@ const Dashboard = () => {
       <h2>Courts</h2>
       <CourtForm onCourtAdded={reload} />
       <ManageCourts key={`courts-${refresh}`} /> {/* ← Cambiado a ManageCourts */}
-
-      <h2>Services</h2>
-      <ServiceForm onServiceAdded={reload} />
-      <ServiceList key={`services-${refresh}`} />
 
       <h2>Reservations</h2>
       <ReservationForm onReservationAdded={reload} />

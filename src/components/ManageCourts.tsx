@@ -1,8 +1,10 @@
+// src/components/ManageCourts.tsx
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import AdminNav from './AdminNav';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaMoneyBillWave, FaClock } from 'react-icons/fa';
 import { Court } from '../interfaces/Court';
 
 interface Company {
@@ -20,18 +22,16 @@ export default function ManageCourts() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-
-    // 1) Nombre de la empresa
+    // 1) Obtener nombre de la empresa
     axios
       .get<Company>(`/api/empresas/${empresaId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => setCompanyName(res.data.nombre))
       .catch(() => setCompanyName(`Empresa #${empresaId}`));
-
-    // 2) Lista de canchas
+    // 2) Listar canchas de la empresa
     axios
-      .get<Court[]>(`/api/canchas?company_id=${empresaId}`, {
+      .get<Court[]>(`/api/canchas?empresa_id=${empresaId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
@@ -43,7 +43,7 @@ export default function ManageCourts() {
   }, [empresaId]);
 
   if (loading) return <div className="p-8 text-gray-700">Cargando canchas…</div>;
-  if (error) return <div className="p-8 text-red-500">{error}</div>;
+  if (error)   return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <div className="flex min-h-screen bg-white">
@@ -79,7 +79,7 @@ export default function ManageCourts() {
             <tbody>
               {courts.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-3 text-center text-gray-500">
+                  <td colSpan={7} className="p-3 text-center text-gray-500">
                     No hay canchas registradas.
                   </td>
                 </tr>
@@ -89,10 +89,11 @@ export default function ManageCourts() {
                     <td className="p-3 text-gray-800">{court.id}</td>
                     <td className="p-3 text-gray-800">{court.nombre}</td>
                     <td className="p-3 text-gray-800">{court.descripcion}</td>
-                    <td className="p-3 text-gray-800">aqui va texto quemado</td>
+                    <td className="p-3 text-gray-800">—</td>
                     <td className="p-3 text-gray-800">{court.deporte}</td>
                     <td className="p-3 text-gray-800">{court.ubicacion}</td>
-                    <td className="p-3 text-center space-x-2">
+                    <td className="p-3 text-center flex justify-center space-x-2">
+                      {/* Editar */}
                       <button
                         title="Editar Cancha"
                         onClick={() => navigate(`/admin/canchas/${empresaId}/${court.id}`)}
@@ -100,6 +101,7 @@ export default function ManageCourts() {
                       >
                         <FaEdit className="text-[#0B91C1]" size={16} />
                       </button>
+                      {/* Eliminar */}
                       <button
                         title="Eliminar Cancha"
                         onClick={async () => {
@@ -118,6 +120,26 @@ export default function ManageCourts() {
                         className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                       >
                         <FaTrash className="text-red-500" size={16} />
+                      </button>
+                      {/* Manejar Tarifas */}
+                      <button
+                        title="Manejar Tarifas"
+                        onClick={() =>
+                          navigate(`/admin/canchas/${empresaId}/${court.id}/tarifas`)
+                        }
+                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                      >
+                        <FaMoneyBillWave className="text-green-600" size={16} />
+                      </button>
+                      {/* Horarios de Funcionamiento */}
+                      <button
+                        title="Horarios de Funcionamiento"
+                        onClick={() =>
+                          navigate(`/admin/canchas/${empresaId}/${court.id}/horarios`)
+                        }
+                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                      >
+                        <FaClock className="text-blue-600" size={16} />
                       </button>
                     </td>
                   </tr>

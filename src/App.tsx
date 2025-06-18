@@ -9,11 +9,12 @@ import AdminDashboard  from './components/AdminDashboard';
 import ManageUsers     from './components/ManageUsers';
 import UserForm        from './components/UserForm';
 
-import ManageCompanies from './components/ManageCompanies';
-import CompanyForm     from './components/CompanyForm';
+import ManageCompanies        from './components/ManageCompanies';
+import CompanyForm            from './components/CompanyForm';
 import SelectCompanyForCourts from './components/SelectCompanyForCourts';
-import ManageCourts    from './components/ManageCourts';
-import CourtForm       from './components/courts/CourtForm';
+
+import ManageCourts from './components/ManageCourts';
+import CourtForm    from './components/courts/CourtForm';
 
 import CompanyDashboard from './components/CompanyDashboard';
 import UserDashboard    from './components/UserDashboard';
@@ -24,6 +25,11 @@ import ServicesSection from './pages/ServicesSection';
 import HelpSection     from './pages/HelpSection';
 import TermsPage       from './pages/TermsAndConditions';
 import PrivacyPolicy   from './pages/PrivacyPolicy';
+
+import TariffList   from './components/TariffList';
+import TariffForm   from './components/TariffForm';
+import ScheduleList from './components/ScheduleList';
+import ScheduleForm from './components/ScheduleForm';
 
 function App() {
   return (
@@ -52,6 +58,8 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Usuarios */}
         <Route
           path="/admin/users"
           element={
@@ -77,6 +85,7 @@ function App() {
           }
         />
 
+        {/* Empresas */}
         <Route
           path="/admin/empresas"
           element={
@@ -102,6 +111,7 @@ function App() {
           }
         />
 
+        {/* Canchas */}
         <Route
           path="/admin/canchas"
           element={
@@ -131,6 +141,50 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={[1]}>
               <CourtForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Tarifas */}
+        <Route
+          path="/admin/canchas/:empresaId/:canchaId/tarifas"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <TariffList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/canchas/:empresaId/:canchaId/tarifas/new"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <TariffForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/canchas/:empresaId/:canchaId/tarifas/:tariffId"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <TariffForm />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Horarios */}
+        <Route
+          path="/admin/canchas/:empresaId/:canchaId/horarios"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <ScheduleList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/canchas/:empresaId/:canchaId/horarios/new"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <ScheduleForm />
             </ProtectedRoute>
           }
         />

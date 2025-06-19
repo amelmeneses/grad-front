@@ -20,45 +20,53 @@ const daysOfWeek = [
 ];
 
 export default function TariffList() {
-  const { empresaId, canchaId } = useParams<{
-    empresaId: string;
-    canchaId: string;
-  }>();
+  const { empresaId, canchaId } = useParams<{ empresaId: string; canchaId: string }>();
+  const canchaNum = Number(canchaId);
+  const navigate = useNavigate();
+
   const [companyName, setCompanyName] = useState('');
   const [courtName,   setCourtName]   = useState('');
   const [tariffs,     setTariffs]     = useState<Tariff[]>([]);
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchAll = () => {
+    setLoading(true);
     const token = localStorage.getItem('token')!;
-    // 1) Empresa
-    axios.get<Company>(`/api/empresas/${empresaId}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => setCompanyName(r.data.nombre))
-      .catch(() => setCompanyName(`Empresa #${empresaId}`));
-    // 2) Cancha
-    axios.get<CourtInfo>(`/api/canchas/${canchaId}`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => setCourtName(r.data.nombre))
-      .catch(() => setCourtName(`Cancha #${canchaId}`));
-    // 3) Tarifas
-    axios.get<Tariff[]>(`/api/canchas/${canchaId}/tarifas`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => { setTariffs(r.data); setError(null) })
-      .catch(() => setError('No se pudieron cargar las tarifas'))
-      .finally(() => setLoading(false));
-  }, [empresaId, canchaId]);
+    Promise.all([
+      axios.get<Company>(`/api/empresas/${empresaId}`, { headers:{ Authorization:`Bearer ${token}` } }),
+      axios.get<CourtInfo>(`/api/canchas/${canchaNum}`,   { headers:{ Authorization:`Bearer ${token}` } }),
+      axios.get<Tariff[]>(`/api/canchas/${canchaNum}/tarifas`, { headers:{ Authorization:`Bearer ${token}` } }),
+    ])
+    .then(([ce, cc, ct]) => {
+      setCompanyName(ce.data.nombre);
+      setCourtName  (cc.data.nombre);
+      setTariffs    (ct.data);
+      setError(null);
+    })
+    .catch(() => setError('Error cargando datos'))
+    .finally(() => setLoading(false));
+  };
+
+  useEffect(fetchAll, [empresaId, canchaNum]);
 
   const handleDelete = async (id: number) => {
     if (!confirm('¿Eliminar esta tarifa?')) return;
-    try {
-      const token = localStorage.getItem('token')!;
-      await axios.delete(`/api/canchas/${canchaId}/tarifas/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTariffs(ts => ts.filter(t => t.id !== id));
-    } catch {
-      alert('Error al eliminar tarifa');
-    }
+    const token = localStorage.getItem('token')!;
+    await axios.delete(`/api/canchas/${canchaNum}/tarifas/${id}`, {
+      headers:{ Authorization:`Bearer ${token}` }
+    });
+    fetchAll();
+  };
+
+  const makeDefault = async (id: number) => {
+    const token = localStorage.getItem('token')!;
+    await axios.put(
+      `/api/canchas/${canchaNum}/tarifas/${id}`,
+      { default: true },
+      { headers:{ Authorization:`Bearer ${token}` } }
+    );
+    fetchAll();
   };
 
   if (loading) return <div className="p-8 text-gray-700">Cargando tarifas…</div>;
@@ -73,7 +81,7 @@ export default function TariffList() {
             Tarifas de {courtName} de {companyName}
           </h1>
           <button
-            onClick={() => navigate(`/admin/canchas/${empresaId}/${canchaId}/tarifas/new`)}
+            onClick={() => navigate(`/admin/canchas/${empresaId}/${canchaNum}/tarifas/new`)}
             className="px-4 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white rounded-lg shadow hover:opacity-90 transition"
           >
             Añadir Tarifa
@@ -94,46 +102,67 @@ export default function TariffList() {
               </tr>
             </thead>
             <tbody>
-              {tariffs.length === 0
-                ? <tr>
-                    <td colSpan={7} className="p-3 text-center text-gray-500">
-                      No hay tarifas registradas.
-                    </td>
-                  </tr>
-                : tariffs.map(t => {
-                    const label = t.dia_semana
-                      ? daysOfWeek.find(d => d.value === t.dia_semana)?.label
-                      : '-';
-                    return (
-                      <tr key={t.id} className="border-b hover:bg-gray-50">
-                        <td className="p-3 text-gray-800">{t.id}</td>
-                        <td className="p-3 text-gray-800">{label}</td>
-                        <td className="p-3 text-gray-800">{t.default ? 'Sí' : 'No'}</td>
-                        <td className="p-3 text-gray-800">{t.hora_inicio}</td>
-                        <td className="p-3 text-gray-800">{t.hora_fin}</td>
-                        <td className="p-3 text-gray-800">{t.tarifa.toFixed(2)}</td>
-                        <td className="p-3 text-center space-x-2">
+              {tariffs.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="p-3 text-center text-gray-500">
+                    No hay tarifas registradas.
+                  </td>
+                </tr>
+              ) : tariffs.map(t => {
+                  const label = t.dia_semana
+                    ? daysOfWeek.find(d => d.value === t.dia_semana)?.label
+                    : '—';
+                  return (
+                    <tr key={t.id} className="border-b hover:bg-gray-50">
+                      <td className="p-3 text-gray-800">{t.id}</td>
+                      <td className="p-3 text-gray-800">{label}</td>
+                      <td className="p-3 text-gray-800">{t.default ? 'Sí' : 'No'}</td>
+                      <td className="p-3 text-gray-800">{t.hora_inicio}</td>
+                      <td className="p-3 text-gray-800">{t.hora_fin}</td>
+                      <td className="p-3 text-gray-800">{t.tarifa.toFixed(2)}</td>
+                      <td className="p-3 text-center space-x-2">
+                        {/* Editar */}
+                        <button
+                          title="Editar Tarifa"
+                          onClick={() =>
+                            navigate(`/admin/canchas/${empresaId}/${canchaNum}/tarifas/${t.id}`)
+                          }
+                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                        >
+                          <FaEdit className="text-[#0B91C1]" size={16} />
+                        </button>
+                        {/* Marcar por defecto */}
+                        {!t.default && (
                           <button
-                            title="Editar Tarifa"
-                            onClick={() =>
-                              navigate(`/admin/canchas/${empresaId}/${canchaId}/tarifas/${t.id}`)
-                            }
-                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                            title="Marcar como tarifa por defecto"
+                            onClick={() => makeDefault(t.id!)}
+                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition text-sm"
                           >
-                            <FaEdit className="text-[#0B91C1]" size={16} />
+                            <span className="text-[#0B91C1]">Por defecto</span>
                           </button>
-                          <button
-                            title="Eliminar Tarifa"
-                            onClick={() => t.id !== undefined && handleDelete(t.id)}
-                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                          >
-                            <FaTrash className="text-red-500" size={16} />
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })
-              }
+                        )}
+                        {/* Eliminar */}
+                        <button
+                          title={
+                            t.default
+                              ? 'Esta es la tarifa por defecto. Cámbiala para poder eliminarla'
+                              : 'Eliminar Tarifa'
+                          }
+                          onClick={() => !t.default && handleDelete(t.id!)}
+                          disabled={t.default}
+                          className={`
+                            p-2 rounded-lg border transition
+                            ${t.default
+                              ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+                              : 'bg-white border-transparent hover:bg-red-50'}
+                          `}
+                        >
+                          <FaTrash className={t.default ? 'text-gray-400' : 'text-red-500'} size={16} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
             </tbody>
           </table>
         </div>

@@ -1,11 +1,12 @@
-// src/components/TariffForm.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FaClock } from 'react-icons/fa';
 import AdminNav from './AdminNav';
 import { Tariff } from '../interfaces/Tariff';
 
 const daysOfWeek = [
+  { value: '',         label: '— Ninguno —' },
   { value: 'monday',    label: 'Lunes' },
   { value: 'tuesday',   label: 'Martes' },
   { value: 'wednesday', label: 'Miércoles' },
@@ -42,26 +43,22 @@ export default function TariffForm() {
       return;
     }
     const token = localStorage.getItem('token');
-    axios.get<Tariff>(
-      `/api/canchas/${canchaId}/tarifas/${tariffId}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    )
-    .then(res => {
-      setTariff({ 
-        ...res.data, 
-        tarifa: Number(res.data.tarifa) 
-      });
-      setErrorMsg(null);
-    })
-    .catch(() => setErrorMsg('No se pudo cargar la tarifa'))
-    .finally(() => setLoading(false));
+    axios
+      .get<Tariff>(`/api/canchas/${canchaId}/tarifas/${tariffId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(res => {
+        setTariff({ ...res.data, tarifa: Number(res.data.tarifa) });
+        setErrorMsg(null);
+      })
+      .catch(() => setErrorMsg('No se pudo cargar la tarifa'))
+      .finally(() => setLoading(false));
   }, [canchaId, tariffId, isEdit]);
 
   const validate = () => {
     const errs: typeof errors = {};
-    if (!tariff.dia_semana)   errs.dia_semana = 'Selecciona un día';
-    if (!tariff.hora_inicio)  errs.hora_inicio = 'Hora de inicio requerida';
-    if (!tariff.hora_fin)     errs.hora_fin    = 'Hora de fin requerida';
+    if (!tariff.hora_inicio) errs.hora_inicio = 'Hora de inicio requerida';
+    if (!tariff.hora_fin)    errs.hora_fin    = 'Hora de fin requerida';
     if (!(tariff.tarifa > 0)) errs.tarifa      = 'Tarifa válida requerida';
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -76,7 +73,6 @@ export default function TariffForm() {
       cancha_id: Number(canchaId!),
       tarifa: Number(tariff.tarifa),
     };
-
     const token = localStorage.getItem('token');
     try {
       if (isEdit) {
@@ -113,30 +109,24 @@ export default function TariffForm() {
             {/* Día de la semana */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
-                Día de la semana
+                Día de la semana (opcional)
               </label>
               <select
                 value={tariff.dia_semana || ''}
                 onChange={e =>
-                  setTariff({ 
-                    ...tariff, 
-                    dia_semana: e.target.value || null 
+                  setTariff({
+                    ...tariff,
+                    dia_semana: e.target.value || null,
                   })
                 }
-                className={`w-full px-4 py-3 border ${
-                  errors.dia_semana ? 'border-red-500' : 'border-gray-200'
-                } rounded-lg focus:ring-2 focus:ring-[#0B91C1] text-gray-900`}
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#0B91C1] text-gray-900"
               >
-                <option value="">— Selecciona un día —</option>
                 {daysOfWeek.map(d => (
                   <option key={d.value} value={d.value}>
                     {d.label}
                   </option>
                 ))}
               </select>
-              {errors.dia_semana && (
-                <p className="mt-1 text-red-600 text-sm">{errors.dia_semana}</p>
-              )}
             </div>
 
             {/* Default */}
@@ -146,10 +136,7 @@ export default function TariffForm() {
                 type="checkbox"
                 checked={tariff.default}
                 onChange={e =>
-                  setTariff({ 
-                    ...tariff, 
-                    default: e.currentTarget.checked 
-                  })
+                  setTariff({ ...tariff, default: e.currentTarget.checked })
                 }
                 className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded"
               />
@@ -159,7 +146,7 @@ export default function TariffForm() {
             </div>
 
             {/* Hora de inicio */}
-            <div>
+            <div className="relative">
               <label className="block text-gray-700 font-medium mb-1">
                 Hora de inicio
               </label>
@@ -169,17 +156,18 @@ export default function TariffForm() {
                 onChange={e =>
                   setTariff({ ...tariff, hora_inicio: e.target.value })
                 }
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-4 py-3 bg-gray-50 border ${
                   errors.hora_inicio ? 'border-red-500' : 'border-gray-200'
                 } rounded-lg focus:ring-2 focus:ring-[#0B91C1] text-gray-900`}
               />
+              <FaClock className="absolute inset-y-0 right-4 m-auto text-gray-400 pointer-events-none" />
               {errors.hora_inicio && (
                 <p className="mt-1 text-red-600 text-sm">{errors.hora_inicio}</p>
               )}
             </div>
 
             {/* Hora de fin */}
-            <div>
+            <div className="relative">
               <label className="block text-gray-700 font-medium mb-1">
                 Hora de fin
               </label>
@@ -189,10 +177,11 @@ export default function TariffForm() {
                 onChange={e =>
                   setTariff({ ...tariff, hora_fin: e.target.value })
                 }
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-4 py-3 bg-gray-50 border ${
                   errors.hora_fin ? 'border-red-500' : 'border-gray-200'
                 } rounded-lg focus:ring-2 focus:ring-[#0B91C1] text-gray-900`}
               />
+              <FaClock className="absolute inset-y-0 right-4 m-auto text-gray-400 pointer-events-none" />
               {errors.hora_fin && (
                 <p className="mt-1 text-red-600 text-sm">{errors.hora_fin}</p>
               )}
@@ -209,12 +198,9 @@ export default function TariffForm() {
                 value={tariff.tarifa.toString()}
                 onChange={e => {
                   const v = parseFloat(e.target.value);
-                  setTariff({ 
-                    ...tariff, 
-                    tarifa: isNaN(v) ? 0 : v 
-                  });
+                  setTariff({ ...tariff, tarifa: isNaN(v) ? 0 : v });
                 }}
-                className={`w-full px-4 py-3 border ${
+                className={`w-full px-4 py-3 bg-gray-50 border ${
                   errors.tarifa ? 'border-red-500' : 'border-gray-200'
                 } rounded-lg focus:ring-2 focus:ring-[#0B91C1] text-gray-900`}
               />

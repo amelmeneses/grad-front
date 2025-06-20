@@ -28,8 +28,8 @@ import PrivacyPolicy   from './pages/PrivacyPolicy';
 
 import TariffList   from './components/TariffList';
 import TariffForm   from './components/TariffForm';
-import ScheduleList from './components/ScheduleList';
-import ScheduleForm from './components/ScheduleForm';
+import OpenHoursList from './components/OpenHoursList';
+import OpenHoursForm from './components/OpenHoursForm';
 
 function App() {
   return (
@@ -176,7 +176,7 @@ function App() {
           path="/admin/canchas/:empresaId/:canchaId/horarios"
           element={
             <ProtectedRoute allowedRoles={[1]}>
-              <ScheduleList />
+              <OpenHoursList />
             </ProtectedRoute>
           }
         />
@@ -184,7 +184,15 @@ function App() {
           path="/admin/canchas/:empresaId/:canchaId/horarios/new"
           element={
             <ProtectedRoute allowedRoles={[1]}>
-              <ScheduleForm />
+              <OpenHoursForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/canchas/:empresaId/:canchaId/horarios/:scheduleId"
+          element={
+            <ProtectedRoute allowedRoles={[1]}>
+              <OpenHoursForm />
             </ProtectedRoute>
           }
         />

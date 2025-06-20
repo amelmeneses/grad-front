@@ -1,6 +1,7 @@
 // src/components/TariffList.tsx
+
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
 import AdminNav from './AdminNav';
 import { FaEdit, FaTrash } from 'react-icons/fa';
@@ -9,6 +10,7 @@ import { Tariff } from '../interfaces/Tariff';
 interface CourtInfo { id: number; nombre: string }
 interface Company   { id: number; nombre: string }
 
+// Define display order for days
 const daysOfWeek = [
   { value: 'monday',    label: 'Lunes' },
   { value: 'tuesday',   label: 'Martes' },
@@ -18,6 +20,8 @@ const daysOfWeek = [
   { value: 'saturday',  label: 'Sábado' },
   { value: 'sunday',    label: 'Domingo' },
 ];
+
+type SortKey = keyof Pick<Tariff, 'id' | 'dia_semana' | 'default' | 'hora_inicio' | 'hora_fin' | 'tarifa'>;
 
 export default function TariffList() {
   const { empresaId, canchaId } = useParams<{ empresaId: string; canchaId: string }>();
@@ -30,6 +34,11 @@ export default function TariffList() {
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState<string | null>(null);
 
+  // Sorting state
+  const [sortKey, setSortKey] = useState<SortKey>('dia_semana');
+  const [asc,     setAsc]     = useState(true);
+
+  // Fetch data
   const fetchAll = () => {
     setLoading(true);
     const token = localStorage.getItem('token')!;
@@ -69,6 +78,52 @@ export default function TariffList() {
     fetchAll();
   };
 
+  // Prepare sorted list
+  const sorted = useMemo(() => {
+    const arr = [...tariffs];
+    arr.sort((a, b) => {
+      let cmp = 0;
+      switch (sortKey) {
+        case 'dia_semana':
+          // find index; missing goes last
+          const ia = a.dia_semana ? daysOfWeek.findIndex(d => d.value === a.dia_semana) : daysOfWeek.length;
+          const ib = b.dia_semana ? daysOfWeek.findIndex(d => d.value === b.dia_semana) : daysOfWeek.length;
+          cmp = ia - ib;
+          break;
+        case 'default':
+          cmp = (a.default === b.default) ? 0 : (a.default ? -1 : 1);
+          break;
+        case 'hora_inicio':
+        case 'hora_fin':
+          cmp = a[sortKey].localeCompare(b[sortKey]);
+          break;
+        case 'tarifa':
+          cmp = a.tarifa - b.tarifa;
+          break;
+        case 'id':
+        default:
+          cmp = (a.id ?? 0) - (b.id ?? 0);
+      }
+      return asc ? cmp : -cmp;
+    });
+    return arr;
+  }, [tariffs, sortKey, asc]);
+
+  const header = (key: SortKey, label: string) => (
+    <th
+      className="p-3 text-left cursor-pointer select-none"
+      onClick={() => {
+        if (sortKey === key) setAsc(!asc);
+        else {
+          setSortKey(key);
+          setAsc(true);
+        }
+      }}
+    >
+      {label} {sortKey === key ? (asc ? '▲' : '▼') : ''}
+    </th>
+  );
+
   if (loading) return <div className="p-8 text-gray-700">Cargando tarifas…</div>;
   if (error)   return <div className="p-8 text-red-500">{error}</div>;
 
@@ -92,23 +147,23 @@ export default function TariffList() {
           <table className="min-w-full bg-white">
             <thead>
               <tr className="bg-gray-100 text-sm text-gray-600 uppercase">
-                <th className="p-3 text-left">ID</th>
-                <th className="p-3 text-left">Día Semana</th>
-                <th className="p-3 text-left">Por Defecto</th>
-                <th className="p-3 text-left">Hora Inicio</th>
-                <th className="p-3 text-left">Hora Fin</th>
-                <th className="p-3 text-left">Tarifa</th>
+                {header('id',          'ID')}
+                {header('dia_semana',  'Día Semana')}
+                {header('default',     'Por Defecto')}
+                {header('hora_inicio', 'Hora Inicio')}
+                {header('hora_fin',    'Hora Fin')}
+                {header('tarifa',      'Tarifa')}
                 <th className="p-3 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              {tariffs.length === 0 ? (
+              {sorted.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="p-3 text-center text-gray-500">
                     No hay tarifas registradas.
                   </td>
                 </tr>
-              ) : tariffs.map(t => {
+              ) : sorted.map(t => {
                   const label = t.dia_semana
                     ? daysOfWeek.find(d => d.value === t.dia_semana)?.label
                     : '—';
@@ -121,7 +176,6 @@ export default function TariffList() {
                       <td className="p-3 text-gray-800">{t.hora_fin}</td>
                       <td className="p-3 text-gray-800">{t.tarifa.toFixed(2)}</td>
                       <td className="p-3 text-center space-x-2">
-                        {/* Editar */}
                         <button
                           title="Editar Tarifa"
                           onClick={() =>
@@ -131,7 +185,6 @@ export default function TariffList() {
                         >
                           <FaEdit className="text-[#0B91C1]" size={16} />
                         </button>
-                        {/* Marcar por defecto */}
                         {!t.default && (
                           <button
                             title="Marcar como tarifa por defecto"
@@ -141,13 +194,10 @@ export default function TariffList() {
                             <span className="text-[#0B91C1]">Por defecto</span>
                           </button>
                         )}
-                        {/* Eliminar */}
                         <button
-                          title={
-                            t.default
-                              ? 'Esta es la tarifa por defecto. Cámbiala para poder eliminarla'
-                              : 'Eliminar Tarifa'
-                          }
+                          title={t.default
+                            ? 'Esta es la tarifa por defecto. Cámbiala para poder eliminarla'
+                            : 'Eliminar Tarifa'}
                           onClick={() => !t.default && handleDelete(t.id!)}
                           disabled={t.default}
                           className={`

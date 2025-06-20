@@ -48,7 +48,7 @@ export default function ManageCourts() {
             { headers: { Authorization: `Bearer ${token}` } }
           );
           const def = tr.data.find(t => t.default);
-          if (def) {
+          if (def && court.id !== undefined) {
             prices[court.id] = Number(def.tarifa);
           }
         } catch {
@@ -104,7 +104,7 @@ export default function ManageCourts() {
                 </tr>
               ) : (
                 courts.map(court => {
-                  const price = defaultPrices[court.id];
+                  const price = court.id !== undefined ? defaultPrices[court.id] : undefined;
                   return (
                     <tr key={court.id} className="border-b hover:bg-gray-50">
                       <td className="p-3 text-gray-800">{court.id}</td>

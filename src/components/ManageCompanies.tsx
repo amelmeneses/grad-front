@@ -25,7 +25,7 @@ interface Company {
   contacto_email: string;
   contacto_telefono: string;
   direccion: string;
-  courts?: Court[];
+  Canchas?: Court[];
 }
 
 export default function ManageCompanies() {
@@ -42,6 +42,7 @@ export default function ManageCompanies() {
         '/api/empresas',
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setCompanies(res.data);
       setError(null);
     } catch {
@@ -91,7 +92,7 @@ export default function ManageCompanies() {
           break;
         case 'tenis':
           IconComp = GiTennisBall;
-          colorClass = 'text-green-300'; // light green
+          colorClass = 'text-yellow-400'; // tennis-ball yellow
           break;
         case 'padel':
           IconComp = FaTableTennis;
@@ -149,7 +150,7 @@ export default function ManageCompanies() {
                   <td className="p-3 text-gray-800">{c.contacto_email}</td>
                   <td className="p-3 text-gray-800">{c.contacto_telefono}</td>
                   <td className="p-3 text-gray-800">{c.direccion}</td>
-                  <td className="p-3 text-gray-800">{renderSportIcons(c.courts)}</td>
+                  <td className="p-3 text-gray-800">{renderSportIcons(c.Canchas)}</td>
                   <td className="p-3 text-center space-x-2">
                     <button
                       title="Editar Empresa"

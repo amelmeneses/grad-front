@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FaClock } from 'react-icons/fa';
 import AdminNav from './AdminNav';
@@ -25,6 +25,7 @@ export default function TariffForm() {
   const isEdit = Boolean(tariffId);
   const navigate = useNavigate();
 
+  // form state
   const [tariff, setTariff] = useState<Tariff>({
     cancha_id: Number(canchaId!),
     dia_semana: null,
@@ -33,33 +34,85 @@ export default function TariffForm() {
     hora_fin: '',
     tarifa: 0,
   });
+  const [initialDefault, setInitialDefault] = useState(false);
+
+  // existing tariffs for overlap check
+  const [existingTariffs, setExistingTariffs] = useState<Tariff[]>([]);
+
   const [errors, setErrors] = useState<Partial<Record<keyof Tariff, string>>>({});
   const [loading, setLoading] = useState(isEdit);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Fetch the one tariff (if editing) and all tariffs
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    // always fetch all for overlap
+    axios
+      .get<Tariff[]>(`/api/canchas/${canchaId}/tarifas`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(res => setExistingTariffs(res.data))
+      .catch(() => { /* ignore overlap-loading errors */ });
+
     if (!isEdit) {
       setLoading(false);
       return;
     }
-    const token = localStorage.getItem('token');
+
     axios
       .get<Tariff>(`/api/canchas/${canchaId}/tarifas/${tariffId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
-        setTariff({ ...res.data, tarifa: Number(res.data.tarifa) });
+        const data = res.data;
+        setTariff({ ...data, tarifa: Number(data.tarifa) });
+        setInitialDefault(Boolean(data.default));
         setErrorMsg(null);
       })
       .catch(() => setErrorMsg('No se pudo cargar la tarifa'))
       .finally(() => setLoading(false));
   }, [canchaId, tariffId, isEdit]);
 
+  // parse "HH:MM" into minutes from midnight
+  const toMinutes = (hhmm: string) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    return h * 60 + m;
+  };
+
   const validate = () => {
     const errs: typeof errors = {};
+    if (!tariff.dia_semana) {
+      errs.dia_semana = 'Selecciona un día, o N/A para tarifa por defecto';
+    }
     if (!tariff.hora_inicio) errs.hora_inicio = 'Hora de inicio requerida';
     if (!tariff.hora_fin)    errs.hora_fin    = 'Hora de fin requerida';
     if (!(tariff.tarifa > 0)) errs.tarifa      = 'Tarifa válida requerida';
+
+    // Overlap check (only if it's not the default-only tariff; and dia_semana set)
+    if (tariff.dia_semana && tariff.hora_inicio && tariff.hora_fin) {
+      const start = toMinutes(tariff.hora_inicio);
+      const end   = toMinutes(tariff.hora_fin);
+      if (end <= start) {
+        errs.hora_fin = 'Hora de fin debe ser después de inicio';
+      } else {
+        // filter same day, exclude self when editing
+        const others = existingTariffs.filter(t => 
+          t.dia_semana === tariff.dia_semana &&
+          (!isEdit || t.id !== Number(tariffId))
+        );
+        for (const o of others) {
+          const oStart = toMinutes(o.hora_inicio);
+          const oEnd   = toMinutes(o.hora_fin);
+          // overlap if start < oEnd && end > oStart
+          if (start < oEnd && end > oStart) {
+            errs.hora_inicio = 'Se solapa con otra tarifa';
+            errs.hora_fin    = 'Se solapa con otra tarifa';
+            break;
+          }
+        }
+      }
+    }
+
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -97,6 +150,8 @@ export default function TariffForm() {
   if (loading) return <div className="p-8 text-gray-700">Cargando tarifa…</div>;
   if (errorMsg) return <div className="p-8 text-red-500">{errorMsg}</div>;
 
+  const isDefaultAndLocked = isEdit && initialDefault;
+
   return (
     <div className="flex min-h-screen bg-white">
       <AdminNav />
@@ -106,6 +161,7 @@ export default function TariffForm() {
             {isEdit ? 'Editar Tarifa' : 'Añadir Tarifa'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
+
             {/* Día de la semana */}
             <div>
               <label className="block text-gray-700 font-medium mb-1">
@@ -127,22 +183,40 @@ export default function TariffForm() {
                   </option>
                 ))}
               </select>
+              {errors.dia_semana && (
+                <p className="mt-1 text-red-600 text-sm">{errors.dia_semana}</p>
+              )}
             </div>
 
             {/* Default */}
-            <div className="flex items-center">
-              <input
-                id="default"
-                type="checkbox"
-                checked={tariff.default}
-                onChange={e =>
-                  setTariff({ ...tariff, default: e.currentTarget.checked })
-                }
-                className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded"
-              />
-              <label htmlFor="default" className="ml-2 text-gray-700 font-medium">
-                Tarifa por defecto
+            <div>
+              <label className="inline-flex items-center cursor-pointer">
+                <input
+                  id="default"
+                  type="checkbox"
+                  checked={tariff.default}
+                  disabled={isDefaultAndLocked}
+                  onChange={e =>
+                    setTariff({ ...tariff, default: e.currentTarget.checked })
+                  }
+                  className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded"
+                />
+                <span className="ml-2 text-gray-700 font-medium">
+                  Tarifa por defecto
+                </span>
               </label>
+              {isDefaultAndLocked && (
+                <p className="mt-1 text-sm text-gray-600">
+                  Elige una tarifa por defecto en el&nbsp;
+                  <Link
+                    to={`/admin/canchas/${empresaId}/${canchaId}/tarifas`}
+                    className="text-blue-600 underline"
+                  >
+                    listado de tarifas
+                  </Link>
+                  .
+                </p>
+              )}
             </div>
 
             {/* Hora de inicio */}

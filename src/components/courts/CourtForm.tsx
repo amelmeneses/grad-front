@@ -1,5 +1,3 @@
-// src/components/courts/CourtForm.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate }        from 'react-router-dom';
 import axios                              from 'axios';
@@ -20,6 +18,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
     descripcion: '',
     ubicacion: '',
     deporte: '',
+    estado: 1,              // <— inicial activo
     empresa_id: Number(empresaId),
   });
   const [loading, setLoading] = useState(isEdit);
@@ -35,7 +34,16 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
       .get<Court>(`/api/canchas/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(res => setForm(res.data as Omit<Court, 'id'>))
+      .then(res => {
+        setForm({
+          nombre:      res.data.nombre,
+          descripcion: res.data.descripcion!,
+          ubicacion:   res.data.ubicacion!,
+          deporte:     res.data.deporte,
+          estado:      res.data.estado,     // <— recuperamos estado
+          empresa_id:  res.data.empresa_id
+        });
+      })
       .catch(() => setError('No se pudo cargar la cancha'))
       .finally(() => setLoading(false));
   }, [id, isEdit]);
@@ -43,16 +51,19 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setForm(prev => ({
       ...prev,
-      [name]: value,
+      [name]: type === 'checkbox'
+        ? Number((e.target as HTMLInputElement).checked)
+        : name === 'estado'
+          ? Number(value)
+          : value,
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submitting form payload:', form); // <-- comprueba aquí
     try {
       const token = localStorage.getItem('token');
       if (isEdit) {
@@ -68,7 +79,6 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
           { headers: { Authorization: `Bearer ${token}` } }
         );
       }
-      // Redirige siempre a la lista de canchas de la empresa
       navigate(`/admin/canchas/${empresaId}`);
     } catch {
       setError('Error al guardar la cancha');
@@ -87,6 +97,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
         {error && <p className="mb-4 text-red-500">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
+          {/* Nombre */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre</label>
             <input
@@ -97,6 +108,8 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
+
+          {/* Descripción */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-900">Descripción</label>
             <input
@@ -106,6 +119,8 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
+
+          {/* Ubicación */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-900">
               Ubicación y referencia
@@ -117,6 +132,8 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
               className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
             />
           </div>
+
+          {/* Deporte */}
           <div>
             <label className="block mb-1 text-sm font-semibold text-gray-900">Deporte</label>
             <select
@@ -133,6 +150,22 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
               <option value="padel">Pádel</option>
             </select>
           </div>
+
+          {/* Estado */}
+          <div className="flex items-center space-x-2">
+            <input
+              id="estado"
+              name="estado"
+              type="checkbox"
+              checked={form.estado === 1}
+              onChange={handleChange}
+              className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded"
+            />
+            <label htmlFor="estado" className="text-gray-700 font-medium">
+              Activa
+            </label>
+          </div>
+
           <button
             type="submit"
             className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B] hover:opacity-90 transition"

@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import LoginPage      from './components/LoginPage';
+import RegisterPage  from './components/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Forbidden      from './components/Forbidden';
 
@@ -38,6 +39,7 @@ function App() {
         {/* Public */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/about-as" element={<AboutAs />} />
         <Route path="/servicios" element={<ServicesSection />} />
         <Route path="/ayuda" element={<HelpSection />} />

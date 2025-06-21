@@ -11,7 +11,6 @@ import UserForm        from './components/UserForm';
 
 import ManageCompanies        from './components/ManageCompanies';
 import CompanyForm            from './components/CompanyForm';
-import SelectCompanyForCourts from './components/SelectCompanyForCourts';
 
 import ManageCourts from './components/ManageCourts';
 import CourtForm    from './components/courts/CourtForm';
@@ -30,6 +29,7 @@ import TariffList   from './components/TariffList';
 import TariffForm   from './components/TariffForm';
 import OpenHoursList from './components/OpenHoursList';
 import OpenHoursForm from './components/OpenHoursForm';
+import CourtsList from './components/CourtsList';
 
 function App() {
   return (
@@ -116,7 +116,7 @@ function App() {
           path="/admin/canchas"
           element={
             <ProtectedRoute allowedRoles={[1]}>
-              <SelectCompanyForCourts />
+              <CourtsList />
             </ProtectedRoute>
           }
         />

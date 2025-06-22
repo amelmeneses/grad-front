@@ -36,10 +36,10 @@ const LoginPage: React.FC = () => {
           navigate('/dashboard-admin');
           break;
         case 2:
-          navigate('/dashboard-company');
+          navigate('/dashboard-user');
           break;
         case 3:
-          navigate('/dashboard-user');
+          navigate('/dashboard-company');
           break;
         default:
           setError('Rol no reconocido');

@@ -6,8 +6,10 @@ import RegisterPage  from './components/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Forbidden      from './components/Forbidden';
 import ActivatePage    from './components/ActivatePage';
+import MiCuentaPage     from './components/MiCuentaPage';
 
 import AdminDashboard  from './components/AdminDashboard';
+import DashboardUser from './components/DashboardUser';
 import ManageUsers     from './components/ManageUsers';
 import UserForm        from './components/UserForm';
 
@@ -52,6 +54,16 @@ function App() {
         <Route path="/reservas" element={<Navigate to="/login" replace />} />
         <Route path="/perfil"  element={<Navigate to="/login" replace />} />
         <Route path="/contacto" element={<Navigate to="/ayuda" replace />} />
+
+        {/* Protected — User */}
+        <Route
+          path="/dashboard-user"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <DashboardUser />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected — Admin */}
         <Route
@@ -202,6 +214,14 @@ function App() {
         />
 
         {/* Protected — Company & User */}
+        <Route
+          path="/mi-cuenta"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <MiCuentaPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard-company"
           element={

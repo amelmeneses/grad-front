@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import Navbar from './Navbar';
 import AdminNav from './AdminNav';
 
 interface Role {
@@ -222,115 +223,124 @@ export default function UserForm() {
   if (loading) return <div className="p-8">Cargando…</div>;
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <AdminNav />
-      <main className="flex-1 p-8 max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          {isEdit ? 'Editar Usuario' : 'Crear Usuario'}
-        </h1>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-
-        <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
-          {/* Campos básicos: nombre, apellido, email */}
-          {['nombre', 'apellido', 'email'].map(field => (
-            <div key={field}>
-              <label className="block mb-1 text-sm font-semibold text-gray-900 capitalize">{field}</label>
+    <>
+      {/* Navbar superior fijo */}
+      <Navbar />
+  
+      {/* Layout principal */}
+      <div className="flex min-h-screen bg-white mt-16">
+        {/* Barra lateral de administración */}
+        <AdminNav />
+  
+        {/* Contenido principal */}
+        <main className="flex-1 p-8 max-w-lg mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            {isEdit ? 'Editar Usuario' : 'Crear Usuario'}
+          </h1>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
+  
+          <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
+            {/* Campos: nombre, apellido, email */}
+            {['nombre', 'apellido', 'email'].map(field => (
+              <div key={field}>
+                <label className="block mb-1 text-sm font-semibold text-gray-900 capitalize">{field}</label>
+                <input
+                  name={field}
+                  type={field === 'email' ? 'email' : 'text'}
+                  value={(form as any)[field]}
+                  onChange={handleChange}
+                  required
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+                />
+              </div>
+            ))}
+  
+            {/* Contraseñas */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">
+                Contraseña {isEdit && <span className="text-xs">(vacío = sin cambio)</span>}
+              </label>
               <input
-                name={field}
-                type={field === 'email' ? 'email' : 'text'}
-                value={(form as any)[field]}
+                name="password"
+                type="password"
+                value={form.password}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
-          ))}
-
-          {/* Contraseña y confirmar */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">
-              Contraseña {isEdit && <span className="text-xs">(vacío = sin cambio)</span>}
-            </label>
-            <input
-              name="password"
-              type="password"
-              value={form.password}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Confirmar Contraseña</label>
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
-
-          {/* Rol */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Rol</label>
-            <select
-              name="rol_id"
-              value={form.rol_id}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Confirmar Contraseña</label>
+              <input
+                type="password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              />
+            </div>
+  
+            {/* Rol */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Rol</label>
+              <select
+                name="rol_id"
+                value={form.rol_id}
+                onChange={handleChange}
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              >
+                {roles.map(r => (
+                  <option key={r.id} value={r.id}>
+                    {r.nombre.charAt(0).toUpperCase() + r.nombre.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
+  
+            {/* Estado */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Estado</label>
+              <select
+                name="estado"
+                value={form.estado}
+                onChange={handleChange}
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              >
+                <option value={1}>Activo</option>
+                <option value={0}>Inactivo</option>
+              </select>
+            </div>
+  
+            {/* Datos de Empresa (si aplica) */}
+            {companyRoleId && form.rol_id === companyRoleId && (
+              <>
+                <hr className="my-4 border-gray-200" />
+                <h2 className="text-lg font-bold text-gray-900 mb-2">Datos de Empresa</h2>
+                {( ['nombre', 'contacto_email', 'contacto_telefono', 'direccion'] as (keyof EmpresaData)[] ).map(field => (
+                  <div key={field}>
+                    <label className="block mb-1 text-sm font-semibold text-gray-900">
+                      {field.replace('_', ' ')}
+                    </label>
+                    <input
+                      name={field}
+                      type={field === 'contacto_email' ? 'email' : 'text'}
+                      value={(empresa as any)[field] || ''}
+                      onChange={handleEmpresa}
+                      required
+                      className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+                    />
+                  </div>
+                ))}
+              </>
+            )}
+  
+            <button
+              type="submit"
+              className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B] hover:opacity-90 transition"
             >
-              {roles.map(r => (
-                <option key={r.id} value={r.id}>
-                  {r.nombre.charAt(0).toUpperCase() + r.nombre.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Estado (activo/inactivo) */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Estado</label>
-            <select
-              name="estado"
-              value={form.estado}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            >
-              <option value={1}>Activo</option>
-              <option value={0}>Inactivo</option>
-            </select>
-          </div>
-
-          {/* Campos de Empresa (si el rol es “empresa”) */}
-          {companyRoleId && form.rol_id === companyRoleId && (
-            <>
-              <hr className="my-4 border-gray-200" />
-              <h2 className="text-lg font-bold text-gray-900 mb-2">Datos de Empresa</h2>
-              {( ['nombre', 'contacto_email', 'contacto_telefono', 'direccion'] as (keyof EmpresaData)[] ).map(field => (
-                <div key={field}>
-                  <label className="block mb-1 text-sm font-semibold text-gray-900">
-                    {field.replace('_', ' ')}
-                  </label>
-                  <input
-                    name={field}
-                    type={field === 'contacto_email' ? 'email' : 'text'}
-                    value={(empresa as any)[field] || ''}
-                    onChange={handleEmpresa}
-                    required
-                    className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-                  />
-                </div>
-              ))}
-            </>
-          )}
-
-          <button
-            type="submit"
-            className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B] hover:opacity-90 transition"
-          >
-            {isEdit ? 'Guardar cambios' : 'Crear Usuario'}
-          </button>
-        </form>
-      </main>
-    </div>
+              {isEdit ? 'Guardar cambios' : 'Crear Usuario'}
+            </button>
+          </form>
+        </main>
+      </div>
+    </>
   );
 }

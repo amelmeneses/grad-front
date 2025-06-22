@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
+import Navbar from './Navbar';
 import AdminNav from './AdminNav';
 
 interface EmpresaData {
@@ -113,91 +114,101 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
   if (loading) return <div className="p-8">Cargando…</div>;
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <AdminNav />
-      <main className="flex-1 p-8 max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          {isEdit ? 'Editar Empresa' : 'Crear Empresa'}
-        </h1>
-        {error && <p className="mb-4 text-red-500">{error}</p>}
+    <>
+      {/* Navbar superior */}
+      <Navbar />
 
-        <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
-          {/* Nombre */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre</label>
-            <input
-              name="nombre"
-              value={form.nombre}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
+      {/* Layout con margen para navbar fijo */}
+      <div className="flex min-h-screen bg-white mt-16">
+        <AdminNav />
 
-          {/* Email contacto */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Correo de Contacto</label>
-            <input
-              name="contacto_email"
-              type="email"
-              value={form.contacto_email}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
+        <main className="flex-1 p-8 max-w-lg mx-auto">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            {isEdit ? 'Editar Empresa' : 'Crear Empresa'}
+          </h1>
+          {error && <p className="mb-4 text-red-500">{error}</p>}
 
-          {/* Teléfono */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Teléfono</label>
-            <input
-              name="contacto_telefono"
-              value={form.contacto_telefono}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
-
-          {/* Dirección */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Dirección</label>
-            <input
-              name="direccion"
-              value={form.direccion}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            />
-          </div>
-
-          {/* Usuario propietario */}
-          <div>
-            <label className="block mb-1 text-sm font-semibold text-gray-900">Usuario (propietario)</label>
-            <select
-              name="usuario_id"
-              value={form.usuario_id}
-              onChange={handleChange}
-              required
-              className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-            >
-              <option value="">Selecciona un usuario</option>
-              {users.map(u => (
-                <option key={u.id} value={u.id}>
-                  {u.nombre} {u.apellido} (ID: {u.id})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full py-3 text-white font-medium rounded-lg text-gray-900 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]"
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5 bg-white p-6 rounded-2xl shadow-lg"
           >
-            {isEdit ? 'Guardar Cambios' : 'Crear Empresa'}
-          </button>
-        </form>
-      </main>
-    </div>
+            {/* Nombre */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre</label>
+              <input
+                name="nombre"
+                value={form.nombre}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Correo de Contacto</label>
+              <input
+                name="contacto_email"
+                type="email"
+                value={form.contacto_email}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              />
+            </div>
+
+            {/* Teléfono */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Teléfono</label>
+              <input
+                name="contacto_telefono"
+                value={form.contacto_telefono}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              />
+            </div>
+
+            {/* Dirección */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Dirección</label>
+              <input
+                name="direccion"
+                value={form.direccion}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              />
+            </div>
+
+            {/* Usuario dueño */}
+            <div>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Usuario (propietario)</label>
+              <select
+                name="usuario_id"
+                value={form.usuario_id}
+                onChange={handleChange}
+                required
+                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+              >
+                <option value="">Selecciona un usuario</option>
+                {users.map(u => (
+                  <option key={u.id} value={u.id}>
+                    {u.nombre} {u.apellido} (ID: {u.id})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B]"
+            >
+              {isEdit ? 'Guardar Cambios' : 'Crear Empresa'}
+            </button>
+          </form>
+        </main>
+      </div>
+    </>
   );
 }

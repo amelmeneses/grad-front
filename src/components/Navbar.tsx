@@ -42,8 +42,10 @@ const Navbar: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login', { replace: true });
+    if (window.confirm('¿Está seguro de cerrar sesión?')) {
+      localStorage.removeItem('token');
+      navigate('/login', { replace: true });
+    }
   };
 
   return (
@@ -70,11 +72,14 @@ const Navbar: React.FC = () => {
             </Link>
           ))}
 
-          {roleId === 2 && userName ? (
+          {userName && roleId ? (
             <div className="flex items-center space-x-2">
-              {/* “Mi Cuenta” button */}
               <Link
-                to="/mi-cuenta"
+                to={
+                  roleId === 1 ? '/dashboard-admin' :
+                  roleId === 2 ? '/mi-cuenta' :
+                  roleId === 3 ? '/dashboard-empresa' : '/'
+                }
                 className="py-2 px-6 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
                            text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
               >
@@ -133,10 +138,14 @@ const Navbar: React.FC = () => {
             </Link>
           ))}
 
-          {roleId === 2 && userName ? (
+          {userName && roleId ? (
             <div className="space-y-4">
               <Link
-                to="/mi-cuenta"
+                to={
+                  roleId === 1 ? '/dashboard-admin' :
+                  roleId === 2 ? '/mi-cuenta' :
+                  roleId === 3 ? '/dashboard-empresa' : '/'
+                }
                 onClick={() => setMenuOpen(false)}
                 className="block w-full text-center py-3 px-12 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
                            text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminNav from './AdminNav';
+import Navbar from './Navbar';
 import {
   FaEdit,
   FaTrash,
@@ -115,71 +116,80 @@ export default function ManageCompanies() {
   if (error)   return <div className="p-8 text-red-500">{error}</div>;
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <AdminNav />
-      <main className="flex-1 p-8">
-        <header className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-800">Empresas</h1>
-            <p className="text-gray-600">Gestión de empresas</p>
-          </div>
-          <button
-            onClick={() => navigate('/admin/empresa')}
-            className="px-5 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white font-medium rounded-lg shadow-lg hover:opacity-90 transition"
-          >
-            Añadir Empresa
-          </button>
-        </header>
+    <>
+      {/* Header principal */}
+      <Navbar />
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr className="bg-gray-100 text-left text-sm text-gray-600 uppercase">
-                <th className="p-3">Nombre</th>
-                <th className="p-3">Email Contacto</th>
-                <th className="p-3">Teléfono</th>
-                <th className="p-3">Dirección</th>
-                <th className="p-3">Canchas</th>
-                <th className="p-3 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {companies.map(c => (
-                <tr key={c.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 text-gray-800">{c.nombre}</td>
-                  <td className="p-3 text-gray-800">{c.contacto_email}</td>
-                  <td className="p-3 text-gray-800">{c.contacto_telefono}</td>
-                  <td className="p-3 text-gray-800">{c.direccion}</td>
-                  <td className="p-3 text-gray-800">{renderSportIcons(c.Canchas)}</td>
-                  <td className="p-3 text-center space-x-2">
-                    <button
-                      title="Editar Empresa"
-                      onClick={() => navigate(`/admin/empresa/${c.id}`)}
-                      className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                    >
-                      <FaEdit className="text-[#0B91C1]" size={16} />
-                    </button>
-                    <button
-                      title="Eliminar Empresa"
-                      onClick={() => handleDelete(c.id)}
-                      className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                    >
-                      <FaTrash className="text-red-500" size={16} />
-                    </button>
-                    <button
-                      title="Detalle Canchas"
-                      onClick={() => navigate(`/admin/canchas/${c.id}`)}
-                      className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                    >
-                      <TbSoccerField className="text-green-600" size={18} />
-                    </button>
-                  </td>
+      {/* Contenido con margen para dejar espacio al navbar fijo */}
+      <div className="flex min-h-screen bg-white mt-16">
+        {/* Barra lateral del admin */}
+        <AdminNav />
+
+        {/* Contenido principal */}
+        <main className="flex-1 p-8">
+          <header className="flex justify-between items-center mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Empresas</h1>
+              <p className="text-gray-600">Gestión de empresas</p>
+            </div>
+            <button
+              onClick={() => navigate('/admin/empresa')}
+              className="px-5 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white font-medium rounded-lg shadow-lg hover:opacity-90 transition"
+            >
+              Añadir Empresa
+            </button>
+          </header>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead>
+                <tr className="bg-gray-100 text-left text-sm text-gray-600 uppercase">
+                  <th className="p-3">Nombre</th>
+                  <th className="p-3">Email Contacto</th>
+                  <th className="p-3">Teléfono</th>
+                  <th className="p-3">Dirección</th>
+                  <th className="p-3">Canchas</th>
+                  <th className="p-3 text-center">Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
+              </thead>
+              <tbody>
+                {companies.map((c) => (
+                  <tr key={c.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3 text-gray-800">{c.nombre}</td>
+                    <td className="p-3 text-gray-800">{c.contacto_email}</td>
+                    <td className="p-3 text-gray-800">{c.contacto_telefono}</td>
+                    <td className="p-3 text-gray-800">{c.direccion}</td>
+                    <td className="p-3 text-gray-800">{renderSportIcons(c.Canchas)}</td>
+                    <td className="p-3 text-center space-x-2">
+                      <button
+                        title="Editar Empresa"
+                        onClick={() => navigate(`/admin/empresa/${c.id}`)}
+                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                      >
+                        <FaEdit className="text-[#0B91C1]" size={16} />
+                      </button>
+                      <button
+                        title="Eliminar Empresa"
+                        onClick={() => handleDelete(c.id)}
+                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                      >
+                        <FaTrash className="text-red-500" size={16} />
+                      </button>
+                      <button
+                        title="Detalle Canchas"
+                        onClick={() => navigate(`/admin/canchas/${c.id}`)}
+                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                      >
+                        <TbSoccerField className="text-green-600" size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }

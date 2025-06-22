@@ -8,6 +8,7 @@ import { FaEdit, FaTrash, FaMoneyBillWave, FaClock } from 'react-icons/fa';
 import { Court } from '../interfaces/Court';
 import { Tariff } from '../interfaces/Tariff';
 import { Company } from '../interfaces/Company';
+import Navbar from './Navbar';
 
 interface Option {
   value: number | 'all';
@@ -175,132 +176,139 @@ export default function CourtsList() {
   const empresaIdNum = selectedCompany.value !== 'all' ? selectedCompany.value : undefined;
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <AdminNav />
-      <main className="flex-1 p-8">
-        <header className="mb-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">Listado de Canchas</h1>
-            <button
-              disabled={!empresaIdNum}
-              onClick={() => navigate(`/admin/canchas/${empresaIdNum}/new`)}
-              className="px-4 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
-                         text-white rounded-lg shadow hover:opacity-90 transition disabled:opacity-50"
-            >
-              Añadir Cancha
-            </button>
-          </div>
-          <div className="mt-4 max-w-sm">
-            <Select<Option, false>
-              options={companies}
-              value={selectedCompany}
-              onChange={opt => opt && setSelectedCompany(opt)}
-              isSearchable
-              styles={customStyles}
-            />
-          </div>
-        </header>
+    <>
+      {/* Header fijo */}
+      <Navbar />
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr className="bg-gray-100 text-sm text-gray-600 uppercase">
-                {header('id',        'ID')}
-                {header('nombre',    'Nombre')}
-                {header('deporte',   'Deporte')}
-                {header('ubicacion', 'Ubicación')}
-                {header('estado',    'Estado')}
-                <th className="p-3 text-gray-600 text-left">Precio/Hora</th>
-                <th className="p-3 text-gray-600 text-left">Empresa</th>
-                <th className="p-3 text-gray-600 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedCourts.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="p-3 text-center text-gray-500">
-                    Esta empresa no tiene canchas aún.
-                  </td>
+      {/* Contenedor con margen para compensar el Navbar */}
+      <div className="flex min-h-screen bg-white mt-16">
+        {/* Menú lateral */}
+        <AdminNav />
+
+        {/* Contenido principal */}
+        <main className="flex-1 p-8">
+          <header className="mb-6">
+            <div className="flex justify-between items-center">
+              <h1 className="text-2xl font-bold text-gray-800">Listado de Canchas</h1>
+              <button
+                disabled={!empresaIdNum}
+                onClick={() => navigate(`/admin/canchas/${empresaIdNum}/new`)}
+                className="px-4 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                           text-white rounded-lg shadow hover:opacity-90 transition disabled:opacity-50"
+              >
+                Añadir Cancha
+              </button>
+            </div>
+
+            <div className="mt-4 max-w-sm">
+              <Select<Option, false>
+                options={companies}
+                value={selectedCompany}
+                onChange={opt => opt && setSelectedCompany(opt)}
+                isSearchable
+                styles={customStyles}
+              />
+            </div>
+          </header>
+
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-200">
+              <thead>
+                <tr className="bg-gray-100 text-sm text-gray-600 uppercase">
+                  {header('id',        'ID')}
+                  {header('nombre',    'Nombre')}
+                  {header('deporte',   'Deporte')}
+                  {header('ubicacion', 'Ubicación')}
+                  {header('estado',    'Estado')}
+                  <th className="p-3 text-left">Precio/Hora</th>
+                  <th className="p-3 text-left">Empresa</th>
+                  <th className="p-3 text-center">Acciones</th>
                 </tr>
-              ) : (
-                sortedCourts.map(c => {
-                  const comp = companies.find(o => o.value === c.empresa_id);
-                  return (
-                    <tr key={c.id} className="border-b hover:bg-gray-50">
-                      <td className="p-3 text-gray-800">{c.id}</td>
-                      <td className="p-3 text-gray-800">{c.nombre}</td>
-                      <td className="p-3 text-gray-800">{c.deporte}</td>
-                      <td className="p-3 text-gray-800">{c.ubicacion || '—'}</td>
-                      <td className={`p-3 font-medium ${
-                          c.estado ? 'text-green-600' : 'text-red-600'
-                        }`}
-                      >
-                        {c.estado ? 'Activo' : 'Inactivo'}
-                      </td>
-                      <td className="p-3 text-gray-800">
-                        {prices[c.id!] != null ? `$${prices[c.id!].toFixed(2)}` : '—'}
-                      </td>
-                      <td className="p-3 text-gray-800">{comp?.label || '—'}</td>
-                      <td className="p-3 text-center space-x-2">
-                        <button
-                          title="Editar"
-                          disabled={!c.empresa_id}
-                          onClick={() => navigate(`/admin/canchas/${c.empresa_id}/${c.id}`)}
-                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition disabled:opacity-50"
-                        >
-                          <FaEdit className="text-[#0B91C1]" size={16} />
-                        </button>
-
-                        {c.estado === 1 ? (
+              </thead>
+              <tbody>
+                {sortedCourts.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="p-3 text-center text-gray-500">
+                      Esta empresa no tiene canchas aún.
+                    </td>
+                  </tr>
+                ) : (
+                  sortedCourts.map(c => {
+                    const comp = companies.find(o => o.value === c.empresa_id);
+                    return (
+                      <tr key={c.id} className="border-b hover:bg-gray-50">
+                        <td className="p-3 text-gray-800">{c.id}</td>
+                        <td className="p-3 text-gray-800">{c.nombre}</td>
+                        <td className="p-3 text-gray-800">{c.deporte}</td>
+                        <td className="p-3 text-gray-800">{c.ubicacion || '—'}</td>
+                        <td className={`p-3 font-medium ${c.estado ? 'text-green-600' : 'text-red-600'}`}>
+                          {c.estado ? 'Activo' : 'Inactivo'}
+                        </td>
+                        <td className="p-3 text-gray-800">
+                          {prices[c.id!] != null ? `$${prices[c.id!].toFixed(2)}` : '—'}
+                        </td>
+                        <td className="p-3 text-gray-800">{comp?.label || '—'}</td>
+                        <td className="p-3 text-center space-x-2">
                           <button
-                            title="Desactivar Cancha"
-                            onClick={() => toggleEstado(c.id!, c.estado)}
-                            className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
+                            title="Editar"
+                            disabled={!c.empresa_id}
+                            onClick={() => navigate(`/admin/canchas/${c.empresa_id}/${c.id}`)}
+                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition disabled:opacity-50"
                           >
-                            Desactivar
+                            <FaEdit className="text-[#0B91C1]" size={16} />
                           </button>
-                        ) : (
-                          <button
-                            title="Activar Cancha"
-                            onClick={() => toggleEstado(c.id!, c.estado)}
-                            className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
-                          >
-                            Activar
-                          </button>
-                        )}
 
-                        <button
-                          title="Eliminar"
-                          onClick={() => handleDelete(c.id!)}
-                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition text-red-500"
-                        >
-                          <FaTrash size={16} />
-                        </button>
-                        <button
-                          title="Tarifas"
-                          disabled={!c.empresa_id}
-                          onClick={() => navigate(`/admin/canchas/${c.empresa_id}/${c.id}/tarifas`)}
-                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition disabled:opacity-50"
-                        >
-                          <FaMoneyBillWave className="text-green-600" size={16} />
-                        </button>
-                        <button
-                          title="Horarios"
-                          disabled={!c.empresa_id}
-                          onClick={() => navigate(`/admin/canchas/${c.empresa_id}/${c.id}/horarios`)}
-                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition disabled:opacity-50"
-                        >
-                          <FaClock className="text-blue-600" size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
+                          {c.estado === 1 ? (
+                            <button
+                              title="Desactivar Cancha"
+                              onClick={() => toggleEstado(c.id!, c.estado)}
+                              className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
+                            >
+                              Desactivar
+                            </button>
+                          ) : (
+                            <button
+                              title="Activar Cancha"
+                              onClick={() => toggleEstado(c.id!, c.estado)}
+                              className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
+                            >
+                              Activar
+                            </button>
+                          )}
+
+                          <button
+                            title="Eliminar"
+                            onClick={() => handleDelete(c.id!)}
+                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition text-red-500"
+                          >
+                            <FaTrash size={16} />
+                          </button>
+                          <button
+                            title="Tarifas"
+                            disabled={!c.empresa_id}
+                            onClick={() => navigate(`/admin/canchas/${c.empresa_id}/${c.id}/tarifas`)}
+                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition disabled:opacity-50"
+                          >
+                            <FaMoneyBillWave className="text-green-600" size={16} />
+                          </button>
+                          <button
+                            title="Horarios"
+                            disabled={!c.empresa_id}
+                            onClick={() => navigate(`/admin/canchas/${c.empresa_id}/${c.id}/horarios`)}
+                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition disabled:opacity-50"
+                          >
+                            <FaClock className="text-blue-600" size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }

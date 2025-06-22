@@ -5,5 +5,6 @@ export interface Court {
   ubicacion?: string;
   deporte: string;
   estado: number;
+  imagen_principal: string;
   empresa_id: number;
 }

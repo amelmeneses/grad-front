@@ -1,10 +1,22 @@
+import Navbar from './Navbar';
 import AdminNav from './AdminNav';
 
 export default function AdminDashboard() {
   return (
-    <div className="flex min-h-screen bg-white">
-      <AdminNav />
-      {/* aquí tu contenido principal */}
-    </div>
+    <>
+      {/* Navbar fijo en la parte superior */}
+      <Navbar />
+
+      {/* Layout principal con margen para el Navbar */}
+      <div className="flex min-h-screen bg-white mt-16">
+        <AdminNav />
+        
+        {/* Contenido principal */}
+        <main className="flex-1 p-8">
+          <h1 className="text-2xl font-bold text-gray-800 mb-4">Dashboard Administrativo</h1>
+          <p className="text-gray-600">Bienvenido al panel de administración.</p>
+        </main>
+      </div>
+    </>
   );
 }

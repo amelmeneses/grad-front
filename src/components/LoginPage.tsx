@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';               // Ajusta la ruta si tu estructura es distinta
 import singInImage from '../assets/imagen_singIn.svg';
 
@@ -17,6 +17,9 @@ const LoginPage: React.FC = () => {
   const [password, setPassword]     = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError]           = useState<string | null>(null);
+  const location = useLocation();
+  // grab any info message passed from registration
+  const successInfo = (location.state as any)?.info as string | undefined;
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -62,6 +65,13 @@ const LoginPage: React.FC = () => {
             <p className="text-sm text-gray-600 mb-6 text-center">
               Por favor, introduzca sus datos.
             </p>
+            {/* show registration info message if present */}
+            {successInfo && (
+              <p className="text-green-600 text-center mb-4">
+                {successInfo}
+              </p>
+            )}
+            {/* show login error */}
             {error && (
               <p className="text-red-500 text-center mb-4">
                 {error}

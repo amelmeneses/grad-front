@@ -5,6 +5,7 @@ import LoginPage      from './components/LoginPage';
 import RegisterPage  from './components/RegisterPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import Forbidden      from './components/Forbidden';
+import ActivatePage    from './components/ActivatePage';
 
 import AdminDashboard  from './components/AdminDashboard';
 import ManageUsers     from './components/ManageUsers';
@@ -40,6 +41,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/activate/user/:token" element={<ActivatePage />} />
         <Route path="/about-as" element={<AboutAs />} />
         <Route path="/servicios" element={<ServicesSection />} />
         <Route path="/ayuda" element={<HelpSection />} />

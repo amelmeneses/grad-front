@@ -23,11 +23,11 @@ const RegisterPage: React.FC = () => {
     }
 
     try {
-      await axios.post('/api/register-anon-user', {
-        nombre, apellido, email, password
-      });
-      // tras registro, quizá mostrar mensaje y redirigir a login
-      navigate('/login');
+     const { data } = await axios.post('/api/register-anon-user', {
+       nombre, apellido, email, password
+     });
+     // redirect to /login carrying the success message
+     navigate('/login', { state: { info: data.message } });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse');
     }

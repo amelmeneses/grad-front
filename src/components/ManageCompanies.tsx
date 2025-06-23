@@ -1,5 +1,3 @@
-// src/components/ManageCompanies.tsx
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -33,16 +31,16 @@ export default function ManageCompanies() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   const fetchCompanies = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await axios.get<Company[]>(
-        '/api/empresas',
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.get<Company[]>('/api/empresas', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       setCompanies(res.data);
       setError(null);
@@ -61,7 +59,9 @@ export default function ManageCompanies() {
     if (!window.confirm('¿Está seguro que desea eliminar esta empresa?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/api/empresas/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+      await axios.delete(`/api/empresas/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchCompanies();
     } catch (err: any) {
       alert(err.response?.data?.message || 'Error al eliminar la empresa');
@@ -71,7 +71,6 @@ export default function ManageCompanies() {
   const renderSportIcons = (courts?: Court[]) => {
     if (!Array.isArray(courts) || courts.length === 0) return <span>0</span>;
 
-    // Count only the four supported sports
     const counts: Record<string, number> = { futbol: 0, basket: 0, tenis: 0, padel: 0 };
     courts.forEach(c => {
       const key = c.deporte.toLowerCase();
@@ -85,19 +84,18 @@ export default function ManageCompanies() {
       switch (sport) {
         case 'futbol':
           IconComp = FaFutbol;
-          colorClass = ''; // leave default black/white
           break;
         case 'basket':
           IconComp = FaBasketballBall;
-          colorClass = 'text-red-700'; // dark tomato
+          colorClass = 'text-red-700';
           break;
         case 'tenis':
           IconComp = GiTennisBall;
-          colorClass = 'text-yellow-400'; // tennis-ball yellow
+          colorClass = 'text-yellow-400';
           break;
         case 'padel':
           IconComp = FaTableTennis;
-          colorClass = 'text-blue-300'; // light blue
+          colorClass = 'text-blue-300';
           break;
         default:
           return;
@@ -113,19 +111,13 @@ export default function ManageCompanies() {
   };
 
   if (loading) return <div className="p-8">Cargando empresas…</div>;
-  if (error)   return <div className="p-8 text-red-500">{error}</div>;
+  if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <>
-      {/* Header principal */}
       <Navbar />
-
-      {/* Contenido con margen para dejar espacio al navbar fijo */}
       <div className="flex min-h-screen bg-white mt-16">
-        {/* Barra lateral del admin */}
         <AdminNav />
-
-        {/* Contenido principal */}
         <main className="flex-1 p-8">
           <header className="flex justify-between items-center mb-6">
             <div>
@@ -140,6 +132,18 @@ export default function ManageCompanies() {
             </button>
           </header>
 
+          {/* Buscador */}
+          <div className="mb-6 max-w-sm">
+            <input
+              type="text"
+              placeholder="Buscar por nombre de empresa..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded-md shadow-sm text-black"
+            />
+          </div>
+
+          {/* Tabla */}
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200">
               <thead>
@@ -153,38 +157,42 @@ export default function ManageCompanies() {
                 </tr>
               </thead>
               <tbody>
-                {companies.map((c) => (
-                  <tr key={c.id} className="border-b hover:bg-gray-50">
-                    <td className="p-3 text-gray-800">{c.nombre}</td>
-                    <td className="p-3 text-gray-800">{c.contacto_email}</td>
-                    <td className="p-3 text-gray-800">{c.contacto_telefono}</td>
-                    <td className="p-3 text-gray-800">{c.direccion}</td>
-                    <td className="p-3 text-gray-800">{renderSportIcons(c.Canchas)}</td>
-                    <td className="p-3 text-center space-x-2">
-                      <button
-                        title="Editar Empresa"
-                        onClick={() => navigate(`/admin/empresa/${c.id}`)}
-                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                      >
-                        <FaEdit className="text-[#0B91C1]" size={16} />
-                      </button>
-                      <button
-                        title="Eliminar Empresa"
-                        onClick={() => handleDelete(c.id)}
-                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                      >
-                        <FaTrash className="text-red-500" size={16} />
-                      </button>
-                      <button
-                        title="Detalle Canchas"
-                        onClick={() => navigate(`/admin/canchas/${c.id}`)}
-                        className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                      >
-                        <TbSoccerField className="text-green-600" size={18} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {companies
+                  .filter((c) =>
+                    c.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((c) => (
+                    <tr key={c.id} className="border-b hover:bg-gray-50">
+                      <td className="p-3 text-gray-800">{c.nombre}</td>
+                      <td className="p-3 text-gray-800">{c.contacto_email}</td>
+                      <td className="p-3 text-gray-800">{c.contacto_telefono}</td>
+                      <td className="p-3 text-gray-800">{c.direccion}</td>
+                      <td className="p-3 text-gray-800">{renderSportIcons(c.Canchas)}</td>
+                      <td className="p-3 text-center space-x-2">
+                        <button
+                          title="Editar Empresa"
+                          onClick={() => navigate(`/admin/empresa/${c.id}`)}
+                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                        >
+                          <FaEdit className="text-[#0B91C1]" size={16} />
+                        </button>
+                        <button
+                          title="Eliminar Empresa"
+                          onClick={() => handleDelete(c.id)}
+                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                        >
+                          <FaTrash className="text-red-500" size={16} />
+                        </button>
+                        <button
+                          title="Detalle Canchas"
+                          onClick={() => navigate(`/admin/canchas/${c.id}`)}
+                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
+                        >
+                          <TbSoccerField className="text-green-600" size={18} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

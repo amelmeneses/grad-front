@@ -34,6 +34,7 @@ import TariffForm   from './components/TariffForm';
 import OpenHoursList from './components/OpenHoursList';
 import OpenHoursForm from './components/OpenHoursForm';
 import CourtsList from './components/CourtsList';
+import ReservasPage from './components/ReservasPage';
 
 function App() {
   return (
@@ -51,7 +52,7 @@ function App() {
         <Route path="/politica" element={<PrivacyPolicy />} />
 
         {/* Footer redirects */}
-        <Route path="/reservas" element={<Navigate to="/login" replace />} />
+        <Route path="/reservas" element={<ReservasPage />} />
         <Route path="/perfil"  element={<Navigate to="/login" replace />} />
         <Route path="/contacto" element={<Navigate to="/ayuda" replace />} />
 

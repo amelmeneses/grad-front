@@ -3,8 +3,30 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
 
+function getUserRoleFromToken(): number | null {
+  const tok = localStorage.getItem('token');
+  if (!tok) return null;
+  try {
+    const payload = JSON.parse(atob(tok.split('.')[1]));
+    return payload.role || payload.role_id || null;
+  } catch {
+    return null;
+  }
+}
+
 const DashboardUser: React.FC = () => {
   const navigate = useNavigate();
+
+  const handleNewReserva = () => {
+    const role = getUserRoleFromToken();
+    if (role === 2) {
+      navigate('/reservas');
+    } else {
+      navigate('/login', {
+        state: { info: 'Ingresa con un perfil de cliente para poder realizar reservas.' }
+      });
+    }
+  };
 
   return (
     <>
@@ -17,7 +39,7 @@ const DashboardUser: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Nueva Reserva */}
             <button
-              onClick={() => navigate('/reservas')}
+              onClick={handleNewReserva}
               className="py-16 bg-white rounded-2xl shadow-lg hover:shadow-2xl
                          transition flex items-center justify-center"
             >

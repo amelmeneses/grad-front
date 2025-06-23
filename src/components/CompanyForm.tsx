@@ -20,7 +20,6 @@ interface User {
   rol_id: number;
 }
 
-// 1) Definimos la interfaz de props
 interface CompanyFormProps {
   onCompanyAdded?: () => void;
 }
@@ -39,23 +38,20 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
     usuario_id: 0,
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  // 1) Cargar lista de usuarios con rol “empresa”
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios.get<User[]>('/api/users', {
       headers: { Authorization: `Bearer ${token}` },
     })
     .then(res => {
-      // Filtrar solo rol empresa (en tu DB, rol_id=3)
       setUsers(res.data.filter(u => u.rol_id === 3));
     })
-    .catch(() => setError('No se pudieron cargar usuarios'));
+    .catch(() => setError('No se pudieron cargar los usuarios.'));
 
     if (isEdit) {
-      // 2) Cargar empresa existente
-      axios.get<EmpresaData[]>(`/api/empresas`, {
+      axios.get<EmpresaData[]>('/api/empresas', {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
@@ -63,13 +59,12 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
         if (!empresa) throw new Error();
         setForm(empresa);
       })
-      .catch(() => setError('No se pudo cargar la empresa'))
+      .catch(() => setError('No se pudo cargar la empresa.'))
       .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [id, isEdit]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -83,31 +78,53 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const soloLetras = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{2,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const telefonoRegex = /^[0-9]{10}$/;
+    const contieneLetras = /[A-Za-zÁÉÍÓÚÑáéíóúñ]/;
+
+    if (!soloLetras.test(form.nombre.trim())) {
+      setError('El nombre debe contener solo letras y al menos 2 caracteres.');
+      return;
+    }
+
+    if (!emailRegex.test(form.contacto_email.trim())) {
+      setError('El correo electrónico no tiene un formato válido.');
+      return;
+    }
+
+    if (!telefonoRegex.test(form.contacto_telefono.trim())) {
+      setError('El teléfono debe contener exactamente 10 dígitos numéricos.');
+      return;
+    }
+
+    if (!contieneLetras.test(form.direccion.trim())) {
+      setError('La dirección debe contener texto, no solo números.');
+      return;
+    }
+
+    if (!form.usuario_id) {
+      setError('Debe seleccionar un usuario propietario.');
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       if (isEdit) {
-        await axios.put(
-          `/api/empresas/${id}`,
-          form,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.put(`/api/empresas/${id}`, form, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
       } else {
-        await axios.post(
-          '/api/empresas',
-          form,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.post('/api/empresas', form, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
       }
+
+      if (onCompanyAdded) onCompanyAdded();
       navigate('/admin/empresas');
-      // 2) Si pasaron onCompanyAdded, lo llamamos para refrescar el Dashboard
-      if (onCompanyAdded) {
-        onCompanyAdded();
-        // opcional: limpiar form aquí
-      } else {
-        navigate('/admin/empresas');
-      }
     } catch {
-      setError('Error al guardar la empresa');
+      setError('Error al guardar la empresa. Intenta nuevamente.');
     }
   };
 
@@ -115,80 +132,73 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
 
   return (
     <>
-      {/* Navbar superior */}
       <Navbar />
 
       {/* Layout con margen para navbar fijo */}
       <div className="flex min-h-screen bg-white mt-19">
         <AdminNav />
-
         <main className="flex-1 p-8 max-w-lg mx-auto">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             {isEdit ? 'Editar Empresa' : 'Crear Empresa'}
           </h1>
+
           {error && <p className="mb-4 text-red-500">{error}</p>}
 
           <form
             onSubmit={handleSubmit}
+            noValidate
             className="space-y-5 bg-white p-6 rounded-2xl shadow-lg"
           >
-            {/* Nombre */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Nombre</label>
               <input
                 name="nombre"
+                type="text"
                 value={form.nombre}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
 
-            {/* Email */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Correo de Contacto</label>
               <input
                 name="contacto_email"
-                type="email"
+                type="text"
                 value={form.contacto_email}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
 
-            {/* Teléfono */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Teléfono</label>
               <input
                 name="contacto_telefono"
+                type="text"
                 value={form.contacto_telefono}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
 
-            {/* Dirección */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Dirección</label>
               <input
                 name="direccion"
+                type="text"
                 value={form.direccion}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
 
-            {/* Usuario dueño */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Usuario (propietario)</label>
               <select
                 name="usuario_id"
                 value={form.usuario_id}
                 onChange={handleChange}
-                required
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               >
                 <option value="">Selecciona un usuario</option>

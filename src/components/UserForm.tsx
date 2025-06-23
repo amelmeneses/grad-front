@@ -1,5 +1,3 @@
-// src/components/UserForm.tsx
-
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -25,7 +23,7 @@ interface FormState {
   email: string;
   password: string;
   rol_id: number;
-  estado: number; // 1 = activo, 0 = inactivo
+  estado: number;
 }
 
 export default function UserForm() {
@@ -39,10 +37,11 @@ export default function UserForm() {
     apellido: '',
     email: '',
     password: '',
-    rol_id: 2,   // “usuario” por defecto
-    estado: 1,   // activo por defecto
+    rol_id: 2,
+    estado: 1,
   });
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(!isEdit);
   const [empresa, setEmpresa] = useState<EmpresaData>({
     nombre: '',
     contacto_email: '',
@@ -50,47 +49,40 @@ export default function UserForm() {
     direccion: '',
   });
   const [empresaId, setEmpresaId] = useState<number | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // ID dinámico del rol “empresa”
-  let companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
+  const companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
 
-  // 1) Cargar roles y, si es edición, cargar usuario + empresa
   useEffect(() => {
     const token = localStorage.getItem('token');
-    axios
-      .get<Role[]>('/api/roles', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(res => {
-        const fetchedRoles = res.data;
-        setRoles(fetchedRoles);
-        const fetchedCompanyRoleId = fetchedRoles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
+    axios.get<Role[]>('/api/roles', {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(res => {
+      setRoles(res.data);
+      const fetchedCompanyRoleId = res.data.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
+      if (isEdit && fetchedCompanyRoleId != null) {
+        loadUser(fetchedCompanyRoleId);
+      } else {
+        setLoading(false);
+      }
+    }).catch(() => {
+      setError('No se pudieron cargar los roles');
+      setLoading(false);
+    });
+  }, [id, isEdit]);
 
-        // companyRoleId = roles.find(r => r.nombre.toLowerCase() === 'empresa')?.id;
-        if (isEdit && fetchedCompanyRoleId != null) {
-          loadUser(fetchedCompanyRoleId);
-        } else {
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        setError('No se pudieron cargar los roles')
-        setLoading(false)
-      })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useEffect(() => {
+    if (error) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [error]);
 
-  // 2) Si hay id, traer datos del usuario + (si es rol “empresa”) su empresa
   const loadUser = async (fetchedCompanyRoleId: number) => {
     try {
       const token = localStorage.getItem('token');
-      // Obtener usuario
-      const { data: u } = await axios.get<any>(
-        `/api/users/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const { data: u } = await axios.get(`/api/users/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
       setForm({
         nombre: u.nombre,
         apellido: u.apellido,
@@ -100,12 +92,10 @@ export default function UserForm() {
         estado: u.estado,
       });
 
-      // Si es “empresa”, cargar datos de empresa
       if (u.rol_id === fetchedCompanyRoleId) {
-        const { data: empresas } = await axios.get<EmpresaData[]>(
-          `/api/empresas?usuario_id=${id}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const { data: empresas } = await axios.get(`/api/empresas?usuario_id=${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (empresas.length) {
           const e = empresas[0];
           setEmpresa({
@@ -141,14 +131,66 @@ export default function UserForm() {
     }));
   };
 
-  // 3) Al enviar, validar contraseñas, crear/actualizar usuario y (si es empresa) empresa
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validar contraseñas
+    const soloLetras = /^[A-Za-zÁÉÍÓÚÑáéíóúñ\s]{3,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const telefonoRegex = /^[0-9]{10,}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[^A-Za-z\d]).{6,}$/;
+
+    if (!form.nombre.trim() || !soloLetras.test(form.nombre)) {
+      setError('El nombre debe tener al menos 3 letras y solo contener texto.');
+      return;
+    }
+
+    if (!form.apellido.trim() || !soloLetras.test(form.apellido)) {
+      setError('El apellido debe tener al menos 3 letras y solo contener texto.');
+      return;
+    }
+
+    if (!form.email.trim() || !emailRegex.test(form.email)) {
+      setError('El correo electrónico no es válido.');
+      return;
+    }
+
     if (!isEdit || form.password) {
+      if (!passwordRegex.test(form.password)) {
+        setError('La contraseña debe tener al menos 6 caracteres, una letra, un número y un carácter especial.');
+        return;
+      }
       if (form.password !== confirmPassword) {
         setError('Las contraseñas no coinciden.');
+        return;
+      }
+    }
+
+    if (!form.rol_id && form.rol_id !== 0) {
+      setError('El rol es obligatorio.');
+      return;
+    }
+
+    if (!form.estado && form.estado !== 0) {
+      setError('El estado es obligatorio.');
+      return;
+    }
+
+    if (companyRoleId && form.rol_id === companyRoleId) {
+      const { nombre, contacto_email, contacto_telefono, direccion } = empresa;
+      if (!nombre.trim()) {
+        setError('El nombre de la empresa es obligatorio.');
+        return;
+      }
+      if (!direccion.trim()) {
+        setError('La dirección de la empresa es obligatoria.');
+        return;
+      }
+      if (!emailRegex.test(contacto_email)) {
+        setError('El correo de contacto de la empresa no es válido.');
+        return;
+      }
+      if (!telefonoRegex.test(contacto_telefono)) {
+        setError('El teléfono de la empresa debe tener al menos 10 dígitos numéricos.');
         return;
       }
     }
@@ -157,38 +199,31 @@ export default function UserForm() {
       const token = localStorage.getItem('token');
       let userId = id;
 
-      // Crear o actualizar usuario
       if (isEdit) {
-        await axios.put(
-          `/api/users/${id}`,
-          {
-            nombre: form.nombre,
-            apellido: form.apellido,
-            email: form.email,
-            contrasena: form.password,
-            rol_id: form.rol_id,
-            estado: form.estado,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        await axios.put(`/api/users/${id}`, {
+          nombre: form.nombre,
+          apellido: form.apellido,
+          email: form.email,
+          contrasena: form.password,
+          rol_id: form.rol_id,
+          estado: form.estado,
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
       } else {
-        // Nota: el endpoint de registro puede ser /api/register
-        const res = await axios.post(
-          '/api/register',
-          {
-            nombre: form.nombre,
-            apellido: form.apellido,
-            email: form.email,
-            password: form.password,
-            rol_id: form.rol_id,
-            estado: form.estado,
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        userId = String((res.data as any).id);
+        const res = await axios.post('/api/register', {
+          nombre: form.nombre,
+          apellido: form.apellido,
+          email: form.email,
+          password: form.password,
+          rol_id: form.rol_id,
+          estado: form.estado,
+        }, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        userId = String(res.data.id);
       }
 
-      // Solo si el rol es “empresa”, creamos/actualizamos empresa
       if (companyRoleId && form.rol_id === companyRoleId) {
         const payload = {
           nombre: empresa.nombre,
@@ -197,26 +232,25 @@ export default function UserForm() {
           direccion: empresa.direccion,
           usuario_id: Number(userId),
         };
+
         if (empresaId) {
-          // Actualizar empresa existente
-          await axios.put(
-            `/api/empresas/${empresaId}`,
-            payload,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          await axios.put(`/api/empresas/${empresaId}`, payload, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
         } else {
-          // Crear nueva empresa
-          await axios.post(
-            '/api/empresas',
-            payload,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
+          await axios.post('/api/empresas', payload, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
         }
       }
 
       navigate('/admin/users');
-    } catch {
-      setError('Error al guardar.');
+    } catch (err: any) {
+      if (axios.isAxiosError(err) && err.response?.status === 409) {
+        setError('Ya existe un usuario con este correo.');
+      } else {
+        setError('Error al guardar.');
+      }
     }
   };
 
@@ -224,61 +258,62 @@ export default function UserForm() {
 
   return (
     <>
-      {/* Navbar superior fijo */}
       <Navbar />
   
       {/* Layout principal */}
       <div className="flex min-h-screen bg-white mt-19">
         {/* Barra lateral de administración */}
         <AdminNav />
-  
-        {/* Contenido principal */}
         <main className="flex-1 p-8 max-w-lg mx-auto">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
             {isEdit ? 'Editar Usuario' : 'Crear Usuario'}
           </h1>
           {error && <p className="text-red-500 mb-4">{error}</p>}
-  
           <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
-            {/* Campos: nombre, apellido, email */}
             {['nombre', 'apellido', 'email'].map(field => (
               <div key={field}>
                 <label className="block mb-1 text-sm font-semibold text-gray-900 capitalize">{field}</label>
                 <input
                   name={field}
-                  type={field === 'email' ? 'email' : 'text'}
+                  type="text"
                   value={(form as any)[field]}
                   onChange={handleChange}
-                  required
                   className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                 />
               </div>
             ))}
-  
-            {/* Contraseñas */}
+
             <div>
-              <label className="block mb-1 text-sm font-semibold text-gray-900">
-                Contraseña {isEdit && <span className="text-xs">(vacío = sin cambio)</span>}
-              </label>
+              <label className="block mb-1 text-sm font-semibold text-gray-900">Contraseña</label>
+              {isEdit && (
+                <span className="block text-xs text-gray-500 mb-1">
+                  Deja este campo vacío si no deseas cambiar la contraseña.
+                </span>
+              )}
               <input
                 name="password"
                 type="password"
                 value={form.password}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e);
+                  if (isEdit && !showConfirmPassword) setShowConfirmPassword(true);
+                }}
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
-            <div>
-              <label className="block mb-1 text-sm font-semibold text-gray-900">Confirmar Contraseña</label>
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-                className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
-              />
-            </div>
-  
-            {/* Rol */}
+
+            {showConfirmPassword && (
+              <div>
+                <label className="block mb-1 text-sm font-semibold text-gray-900">Confirmar Contraseña</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
+                />
+              </div>
+            )}
+
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Rol</label>
               <select
@@ -294,8 +329,7 @@ export default function UserForm() {
                 ))}
               </select>
             </div>
-  
-            {/* Estado */}
+
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Estado</label>
               <select
@@ -308,30 +342,28 @@ export default function UserForm() {
                 <option value={0}>Inactivo</option>
               </select>
             </div>
-  
-            {/* Datos de Empresa (si aplica) */}
-            {companyRoleId && form.rol_id === companyRoleId && (
+
+            {roles.length > 0 && companyRoleId && form.rol_id === companyRoleId && (
               <>
                 <hr className="my-4 border-gray-200" />
                 <h2 className="text-lg font-bold text-gray-900 mb-2">Datos de Empresa</h2>
-                {( ['nombre', 'contacto_email', 'contacto_telefono', 'direccion'] as (keyof EmpresaData)[] ).map(field => (
+                {(['nombre', 'contacto_email', 'contacto_telefono', 'direccion'] as (keyof EmpresaData)[]).map(field => (
                   <div key={field}>
                     <label className="block mb-1 text-sm font-semibold text-gray-900">
                       {field.replace('_', ' ')}
                     </label>
                     <input
                       name={field}
-                      type={field === 'contacto_email' ? 'email' : 'text'}
+                      type="text"
                       value={(empresa as any)[field] || ''}
                       onChange={handleEmpresa}
-                      required
                       className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
                     />
                   </div>
                 ))}
               </>
             )}
-  
+
             <button
               type="submit"
               className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B] hover:opacity-90 transition"

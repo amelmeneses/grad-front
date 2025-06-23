@@ -115,10 +115,10 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
       <Navbar />
   
       {/* Layout principal con margen por el navbar */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         {/* Sidebar de administración */}
         <AdminNav />
-  
+
         {/* Contenido principal */}
         <main className="flex-1 p-8 max-w-lg mx-auto">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">

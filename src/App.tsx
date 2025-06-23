@@ -34,6 +34,7 @@ import TariffForm   from './components/TariffForm';
 import OpenHoursList from './components/OpenHoursList';
 import OpenHoursForm from './components/OpenHoursForm';
 import CourtsList from './components/CourtsList';
+import CompanyCourtsList from './components/CompanyCourtsList';
 
 function App() {
   return (
@@ -131,7 +132,7 @@ function App() {
         <Route
           path="/admin/canchas"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <CourtsList />
             </ProtectedRoute>
           }
@@ -139,7 +140,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <ManageCourts />
             </ProtectedRoute>
           }
@@ -147,7 +148,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/new"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <CourtForm />
             </ProtectedRoute>
           }
@@ -155,7 +156,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/:id"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <CourtForm />
             </ProtectedRoute>
           }
@@ -165,7 +166,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/:canchaId/tarifas"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <TariffList />
             </ProtectedRoute>
           }
@@ -173,7 +174,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/:canchaId/tarifas/new"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <TariffForm />
             </ProtectedRoute>
           }
@@ -181,7 +182,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/:canchaId/tarifas/:tariffId"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <TariffForm />
             </ProtectedRoute>
           }
@@ -191,7 +192,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/:canchaId/horarios"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <OpenHoursList />
             </ProtectedRoute>
           }
@@ -199,7 +200,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/:canchaId/horarios/new"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <OpenHoursForm />
             </ProtectedRoute>
           }
@@ -207,7 +208,7 @@ function App() {
         <Route
           path="/admin/canchas/:empresaId/:canchaId/horarios/:scheduleId"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <OpenHoursForm />
             </ProtectedRoute>
           }
@@ -227,6 +228,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={[3]}>
               <CompanyDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/company/empresas"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <CompanyCourtsList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/company/canchas"
+          element={
+            <ProtectedRoute allowedRoles={[3]}>
+              <CompanyCourtsList />
             </ProtectedRoute>
           }
         />

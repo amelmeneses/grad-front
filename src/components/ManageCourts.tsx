@@ -100,7 +100,7 @@ export default function ManageCourts() {
       <Navbar />
 
       {/* Contenedor principal con margen superior para compensar el Navbar */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         {/* Barra lateral admin */}
         <AdminNav />
 

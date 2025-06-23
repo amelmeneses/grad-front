@@ -96,7 +96,7 @@ export default function ManageUsers() {
       <Navbar />
 
       {/* Layout con margen superior para el navbar */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         <AdminNav />
 
         <main className="flex-1 p-8">

@@ -3,6 +3,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useMemo } from 'react';
 import axios from 'axios';
+import Navbar from './Navbar';
 import AdminNav from './AdminNav';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { Tariff } from '../interfaces/Tariff';
@@ -128,95 +129,106 @@ export default function TariffList() {
   if (error)   return <div className="p-8 text-red-500">{error}</div>;
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <AdminNav />
-      <main className="flex-1 p-8">
-        <header className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Tarifas de {courtName} de {companyName}
-          </h1>
-          <button
-            onClick={() => navigate(`/admin/canchas/${empresaId}/${canchaNum}/tarifas/new`)}
-            className="px-4 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white rounded-lg shadow hover:opacity-90 transition"
-          >
-            Añadir Tarifa
-          </button>
-        </header>
+    <>
+      {/* Navbar superior */}
+      <Navbar />
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr className="bg-gray-100 text-sm text-gray-600 uppercase">
-                {header('id',          'ID')}
-                {header('dia_semana',  'Día Semana')}
-                {header('default',     'Por Defecto')}
-                {header('hora_inicio', 'Hora Inicio')}
-                {header('hora_fin',    'Hora Fin')}
-                {header('tarifa',      'Tarifa')}
-                <th className="p-3 text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sorted.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="p-3 text-center text-gray-500">
-                    No hay tarifas registradas.
-                  </td>
+      {/* Layout principal con AdminNav y contenido full-width */}
+      <div className="flex min-h-screen bg-white mt-19">
+        <AdminNav />
+  
+        <main className="flex-1 p-8">
+          <header className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-800">
+              Tarifas de {courtName} de {companyName}
+            </h1>
+            <button
+              onClick={() => navigate(`/admin/canchas/${empresaId}/${canchaNum}/tarifas/new`)}
+              className="px-4 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white rounded-lg shadow hover:opacity-90 transition"
+            >
+              Añadir Tarifa
+            </button>
+          </header>
+  
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white">
+              <thead>
+                <tr className="bg-gray-100 text-sm text-gray-600 uppercase">
+                  {header('id', 'ID')}
+                  {header('dia_semana', 'Día Semana')}
+                  {header('default', 'Por Defecto')}
+                  {header('hora_inicio', 'Hora Inicio')}
+                  {header('hora_fin', 'Hora Fin')}
+                  {header('tarifa', 'Tarifa')}
+                  <th className="p-3 text-center">Acciones</th>
                 </tr>
-              ) : sorted.map(t => {
-                  const label = t.dia_semana
-                    ? daysOfWeek.find(d => d.value === t.dia_semana)?.label
-                    : '—';
-                  return (
-                    <tr key={t.id} className="border-b hover:bg-gray-50">
-                      <td className="p-3 text-gray-800">{t.id}</td>
-                      <td className="p-3 text-gray-800">{label}</td>
-                      <td className="p-3 text-gray-800">{t.default ? 'Sí' : 'No'}</td>
-                      <td className="p-3 text-gray-800">{t.hora_inicio}</td>
-                      <td className="p-3 text-gray-800">{t.hora_fin}</td>
-                      <td className="p-3 text-gray-800">{t.tarifa.toFixed(2)}</td>
-                      <td className="p-3 text-center space-x-2">
-                        <button
-                          title="Editar Tarifa"
-                          onClick={() =>
-                            navigate(`/admin/canchas/${empresaId}/${canchaNum}/tarifas/${t.id}`)
-                          }
-                          className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
-                        >
-                          <FaEdit className="text-[#0B91C1]" size={16} />
-                        </button>
-                        {!t.default && (
+              </thead>
+              <tbody>
+                {sorted.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="p-3 text-center text-gray-500">
+                      No hay tarifas registradas.
+                    </td>
+                  </tr>
+                ) : (
+                  sorted.map(t => {
+                    const label = t.dia_semana
+                      ? daysOfWeek.find(d => d.value === t.dia_semana)?.label
+                      : '—';
+                    return (
+                      <tr key={t.id} className="border-b hover:bg-gray-50">
+                        <td className="p-3 text-gray-800">{t.id}</td>
+                        <td className="p-3 text-gray-800">{label}</td>
+                        <td className="p-3 text-gray-800">{t.default ? 'Sí' : 'No'}</td>
+                        <td className="p-3 text-gray-800">{t.hora_inicio}</td>
+                        <td className="p-3 text-gray-800">{t.hora_fin}</td>
+                        <td className="p-3 text-gray-800">{t.tarifa.toFixed(2)}</td>
+                        <td className="p-3 text-center space-x-2">
                           <button
-                            title="Marcar como tarifa por defecto"
-                            onClick={() => makeDefault(t.id!)}
-                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition text-sm"
+                            title="Editar Tarifa"
+                            onClick={() =>
+                              navigate(`/admin/canchas/${empresaId}/${canchaNum}/tarifas/${t.id}`)
+                            }
+                            className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition"
                           >
-                            <span className="text-[#0B91C1]">Por defecto</span>
+                            <FaEdit className="text-[#0B91C1]" size={16} />
                           </button>
-                        )}
-                        <button
-                          title={t.default
-                            ? 'Esta es la tarifa por defecto. Cámbiala para poder eliminarla'
-                            : 'Eliminar Tarifa'}
-                          onClick={() => !t.default && handleDelete(t.id!)}
-                          disabled={t.default}
-                          className={`
-                            p-2 rounded-lg border transition
-                            ${t.default
-                              ? 'border-gray-300 text-gray-400 cursor-not-allowed'
-                              : 'bg-white border-transparent hover:bg-red-50'}
-                          `}
-                        >
-                          <FaTrash className={t.default ? 'text-gray-400' : 'text-red-500'} size={16} />
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
-        </div>
-      </main>
-    </div>
+                          {!t.default && (
+                            <button
+                              title="Marcar como tarifa por defecto"
+                              onClick={() => makeDefault(t.id!)}
+                              className="bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition text-sm"
+                            >
+                              <span className="text-[#0B91C1]">Por defecto</span>
+                            </button>
+                          )}
+                          <button
+                            title={
+                              t.default
+                                ? 'Esta es la tarifa por defecto. Cámbiala para poder eliminarla'
+                                : 'Eliminar Tarifa'
+                            }
+                            onClick={() => !t.default && handleDelete(t.id!)}
+                            disabled={t.default}
+                            className={`
+                              p-2 rounded-lg border transition
+                              ${t.default
+                                ? 'border-gray-300 text-gray-400 cursor-not-allowed'
+                                : 'bg-white border-transparent hover:bg-red-50'}
+                            `}
+                          >
+                            <FaTrash className={t.default ? 'text-gray-400' : 'text-red-500'} size={16} />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </main>
+      </div>
+    </>
   );
 }

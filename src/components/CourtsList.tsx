@@ -181,7 +181,7 @@ export default function CourtsList() {
       <Navbar />
 
       {/* Contenedor con margen para compensar el Navbar */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         {/* Menú lateral */}
         <AdminNav />
 

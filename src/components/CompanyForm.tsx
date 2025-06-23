@@ -119,7 +119,7 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
       <Navbar />
 
       {/* Layout con margen para navbar fijo */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         <AdminNav />
 
         <main className="flex-1 p-8 max-w-lg mx-auto">

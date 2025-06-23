@@ -8,7 +8,7 @@ export default function AdminDashboard() {
       <Navbar />
 
       {/* Layout principal con margen para el Navbar */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         <AdminNav />
         
         {/* Contenido principal */}

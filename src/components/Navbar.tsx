@@ -78,7 +78,7 @@ const Navbar: React.FC = () => {
                 to={
                   roleId === 1 ? '/dashboard-admin' :
                   roleId === 2 ? '/mi-cuenta' :
-                  roleId === 3 ? '/dashboard-empresa' : '/'
+                  roleId === 3 ? '/dashboard-company' : '/'
                 }
                 className="py-2 px-6 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
                            text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"

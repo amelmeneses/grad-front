@@ -228,7 +228,7 @@ export default function UserForm() {
       <Navbar />
   
       {/* Layout principal */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         {/* Barra lateral de administración */}
         <AdminNav />
   

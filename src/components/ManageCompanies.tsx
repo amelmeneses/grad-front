@@ -121,7 +121,7 @@ export default function ManageCompanies() {
       <Navbar />
 
       {/* Contenido con margen para dejar espacio al navbar fijo */}
-      <div className="flex min-h-screen bg-white mt-16">
+      <div className="flex min-h-screen bg-white mt-19">
         {/* Barra lateral del admin */}
         <AdminNav />
 

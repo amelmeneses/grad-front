@@ -49,7 +49,7 @@ export default function ReservasPage() {
             {sports.map(s => (
               <button
                 key={s.path}
-                onClick={() => navigate(`/reservas/${s.path}`)}
+                onClick={() => navigate(`/canchas/${s.path}`)}
                 className="py-16 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition flex items-center justify-center"
               >
                 <span className="text-2xl font-semibold text-gray-800">

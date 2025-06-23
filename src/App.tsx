@@ -36,6 +36,7 @@ import OpenHoursForm from './components/OpenHoursForm';
 import CourtsList from './components/CourtsList';
 import CompanyCourtsList from './components/CompanyCourtsList';
 import ReservasPage from './components/ReservasPage';
+import CanchasPorDeporte from './components/CanchasPorDeporte';
 
 function App() {
   return (
@@ -56,6 +57,16 @@ function App() {
         <Route path="/reservas" element={<ReservasPage />} />
         <Route path="/perfil"  element={<Navigate to="/login" replace />} />
         <Route path="/contacto" element={<Navigate to="/ayuda" replace />} />
+
+        {/* Protected — Reservas Usuario */}
+        <Route
+          path="/canchas/:deporte"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <CanchasPorDeporte />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected — User */}
         <Route

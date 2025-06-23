@@ -30,6 +30,8 @@ const LoginPage: React.FC = () => {
       const { data } = await axios.post('/api/login', { email, password });
       const payload = jwtDecode<TokenPayload>(data.token);
       localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({ rol_id: payload.role }));
+      
 
       switch (payload.role) {
         case 1:

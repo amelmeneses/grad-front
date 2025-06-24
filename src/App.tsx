@@ -1,42 +1,41 @@
 // src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import LoginPage      from './components/LoginPage';
-import RegisterPage  from './components/RegisterPage';
-import ProtectedRoute from './components/ProtectedRoute';
-import Forbidden      from './components/Forbidden';
-import ActivatePage    from './components/ActivatePage';
+import LoginPage        from './components/LoginPage';
+import RegisterPage     from './components/RegisterPage';
+import ProtectedRoute   from './components/ProtectedRoute';
+import Forbidden        from './components/Forbidden';
+import ActivatePage     from './components/ActivatePage';
 import MiCuentaPage     from './components/MiCuentaPage';
 
-import AdminDashboard  from './components/AdminDashboard';
-import DashboardUser from './components/DashboardUser';
-import ManageUsers     from './components/ManageUsers';
-import UserForm        from './components/UserForm';
+import AdminDashboard     from './components/AdminDashboard';
+import DashboardUser      from './components/DashboardUser';
+import ManageUsers        from './components/ManageUsers';
+import UserForm           from './components/UserForm';
+import ManageCompanies    from './components/ManageCompanies';
+import CompanyForm        from './components/CompanyForm';
+import ManageCourts       from './components/ManageCourts';
+import CourtForm          from './components/courts/CourtForm';
+import CompanyDashboard   from './components/CompanyDashboard';
+import UserDashboard      from './components/UserDashboard';
 
-import ManageCompanies        from './components/ManageCompanies';
-import CompanyForm            from './components/CompanyForm';
+import LandingPage        from './pages/LandingPage';
+import AboutAs            from './pages/AboutAs';
+import ServicesSection    from './pages/ServicesSection';
+import HelpSection        from './pages/HelpSection';
+import TermsPage          from './pages/TermsAndConditions';
+import PrivacyPolicy      from './pages/PrivacyPolicy';
 
-import ManageCourts from './components/ManageCourts';
-import CourtForm    from './components/courts/CourtForm';
+import TariffList         from './components/TariffList';
+import TariffForm         from './components/TariffForm';
+import OpenHoursList      from './components/OpenHoursList';
+import OpenHoursForm      from './components/OpenHoursForm';
+import CourtsList         from './components/CourtsList';
+import CompanyCourtsList  from './components/CompanyCourtsList';
 
-import CompanyDashboard from './components/CompanyDashboard';
-import UserDashboard    from './components/UserDashboard';
-
-import LandingPage     from './pages/LandingPage';
-import AboutAs         from './pages/AboutAs';
-import ServicesSection from './pages/ServicesSection';
-import HelpSection     from './pages/HelpSection';
-import TermsPage       from './pages/TermsAndConditions';
-import PrivacyPolicy   from './pages/PrivacyPolicy';
-
-import TariffList   from './components/TariffList';
-import TariffForm   from './components/TariffForm';
-import OpenHoursList from './components/OpenHoursList';
-import OpenHoursForm from './components/OpenHoursForm';
-import CourtsList from './components/CourtsList';
-import CompanyCourtsList from './components/CompanyCourtsList';
-import ReservasPage from './components/ReservasPage';
-import CanchasPorDeporte from './components/CanchasPorDeporte';
+import ReservasPage       from './components/ReservasPage';
+import CanchasPorDeporte  from './components/CanchasPorDeporte';
+import CanchaDetalle      from './components/CanchaDetalle'; // NUEVO
 
 function App() {
   return (
@@ -67,6 +66,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/cancha/:id"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <CanchaDetalle />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected — User */}
         <Route
@@ -87,8 +94,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Usuarios */}
         <Route
           path="/admin/users"
           element={

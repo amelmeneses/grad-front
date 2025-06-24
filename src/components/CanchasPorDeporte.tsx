@@ -81,11 +81,11 @@ const CanchasPorDeporte: React.FC = () => {
 
         {/* Filtros con borde gradiente */}
         <div className="flex flex-wrap justify-center gap-4 mb-12">
-          {[ 
+          {[
             { placeholder: 'Buscar por nombre', value: nombreFiltro, setter: setNombreFiltro },
             { placeholder: 'Buscar por ubicación', value: ubicacionFiltro, setter: setUbicacionFiltro },
-            { placeholder: 'Precio mínimo', value: precioMin, setter: setPrecioMin, type: 'number' },
-            { placeholder: 'Precio máximo', value: precioMax, setter: setPrecioMax, type: 'number' }
+            { placeholder: 'Precio desde', value: precioMin, setter: setPrecioMin, type: 'number' },
+            { placeholder: 'Precio hasta', value: precioMax, setter: setPrecioMax, type: 'number' }
           ].map((input, idx) => (
             <div
               key={idx}
@@ -115,7 +115,8 @@ const CanchasPorDeporte: React.FC = () => {
             return (
               <div
                 key={cancha.id}
-                className="rounded-xl shadow-md overflow-hidden bg-white border border-gray-200 hover:shadow-lg transition"
+                onClick={() => navigate(`/cancha/${cancha.id}`)}
+                className="cursor-pointer rounded-xl shadow-md overflow-hidden bg-white border border-gray-200 hover:shadow-lg transition"
               >
                 <div className="w-full h-48 bg-gray-100 flex items-center justify-center overflow-hidden relative">
                   {cancha.imagen_principal ? (

@@ -35,7 +35,8 @@ import CompanyCourtsList  from './components/CompanyCourtsList';
 
 import ReservasPage       from './components/ReservasPage';
 import CanchasPorDeporte  from './components/CanchasPorDeporte';
-import CanchaDetalle      from './components/CanchaDetalle'; // NUEVO
+import CanchaDetalle      from './components/CanchaDetalle'; 
+import ReservaStep1       from './components/ReservaStep1';
 
 function App() {
   return (
@@ -74,6 +75,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/reservar/:canchaId"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <ReservaStep1 />
+            </ProtectedRoute>
+          }
+        />
+
 
         {/* Protected — User */}
         <Route
@@ -272,7 +283,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         {/* 403 & fallback */}
         <Route path="/403" element={<Forbidden />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

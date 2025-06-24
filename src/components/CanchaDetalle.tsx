@@ -1,3 +1,4 @@
+// src/components/CanchaDetalle.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -83,7 +84,7 @@ const CanchaDetalle: React.FC = () => {
                   <p className="text-gray-400 mb-6">Tarifa no disponible</p>
                 )}
                 <button
-                  onClick={() => alert('Aquí irá la lógica de reserva')}
+                  onClick={() => navigate(`/reservar/${cancha.id}`)}
                   className="px-6 py-2 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white rounded-full shadow hover:opacity-90 transition"
                 >
                   Reservar

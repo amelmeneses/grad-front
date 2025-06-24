@@ -6,8 +6,8 @@ import UserList        from '../components/users/UserList';
 import CompanyForm     from '../components/CompanyForm';
 import CompanyList     from '../components/companies/CompanyList';
 import ManageCourts    from '../components/ManageCourts';    // ← Import corregido
-import ReservationForm from '../components/reservations/ReservationForm';
-import ReservationList from '../components/reservations/ReservationList';
+// import ReservationForm from '../components/reservations/ReservationForm';
+// import ReservationList from '../components/reservations/ReservationList';
 
 const Dashboard = () => {
   const [refresh, setRefresh] = useState(false);
@@ -30,8 +30,8 @@ const Dashboard = () => {
       <ManageCourts key={`courts-${refresh}`} /> {/* ← Cambiado a ManageCourts */}
 
       <h2>Reservations</h2>
-      <ReservationForm onReservationAdded={reload} />
-      <ReservationList key={`reservations-${refresh}`} />
+      {/* <ReservationForm onReservationAdded={reload} />
+      <ReservationList key={`reservations-${refresh}`} /> */}
     </div>
   );
 };

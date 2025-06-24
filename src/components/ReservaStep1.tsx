@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './Navbar';
 import Card from './ReservaInfoCard';
+import CalendarioReserva from './CalendarioReserva';
 
 import {
   DollarSign,
@@ -59,15 +60,10 @@ const ReservaStep1: React.FC = () => {
 
         {cancha && (
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-            {/* Calendario */}
+            {/* Calendario (lado izquierdo) */}
             <div className="bg-white p-6 rounded-xl shadow-xl">
-              <p className="text-gray-800 mb-4 font-semibold">Selecciona una fecha:</p>
-              <input
-                type="date"
-                className="border rounded px-4 py-2 w-full"
-                value={fecha || ''}
-                onChange={(e) => setFecha(e.target.value)}
-              />
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">Selecciona una fecha:</h2>
+              <CalendarioReserva onDateSelect={(date) => setFecha(date)} />
             </div>
 
             {/* Panel derecho */}
@@ -78,7 +74,7 @@ const ReservaStep1: React.FC = () => {
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <Card icon={DollarSign} title={`$${tarifa?.tarifa ?? 'N/D'}`} subtitle="Costo del alquiler" />
                 <Card icon={Clock} title="1 hora" subtitle="Duración" />
-                <Card icon={Calendar} title="Selecciona el día" subtitle="Date" />
+                <Card icon={Calendar} title={fecha || 'Selecciona'} subtitle="Fecha" />
                 <Card icon={AlarmClock} title="Seleccionar horario" subtitle="Tiempo" />
                 <Card icon={MapPin} title={cancha.ubicacion} subtitle="Ubicación" />
                 <Card icon={Globe} title="Ecuador" subtitle="Zona horaria" />

@@ -75,7 +75,11 @@ const ReservaConfirmada: React.FC = () => {
             <p className="text-gray-500 mb-6">{cancha.descripcion}</p>
 
             <div className="grid grid-cols-2 gap-4 mb-6">
-              <Card icon={DollarSign} title={`$${pago.total}`} subtitle="Costo del alquiler" />
+              <Card
+                icon={DollarSign}
+                title={`$${pago.total}`}
+                subtitle={`Tarifa: $${(pago.total / (horas + minutos / 60)).toFixed(2)} por hora`}
+              />
               <Card icon={Clock} title={duracion} subtitle="Duración" />
               <Card icon={Calendar} title={fecha} subtitle="Fecha" />
               <Card

@@ -142,6 +142,10 @@ const ReservaStep2: React.FC = () => {
   const horas = Math.floor(totalMin / 60);
   const minutos = totalMin % 60;
 
+  const tarifaValor = tarifa?.tarifa ?? 0;
+  const totalHoras = horas + minutos / 60;
+  const totalPagar = (totalHoras * tarifaValor).toFixed(2);
+
   const duracion =
     seleccionados.length === 0
       ? 'Seleccionar'
@@ -193,9 +197,9 @@ const ReservaStep2: React.FC = () => {
               <div className="mt-6 text-center">
                 <button
                   onClick={handleReserva}
-                  className="bg-[#f89e1b] hover:bg-orange-600 text-black font-semibold py-2 px-6 rounded-lg shadow"
+                  className="bg-gradient-to-r from-[#1D9DB6] to-[#EB752B] hover:from-[#138a99] hover:to-[#d95c16] text-white font-semibold py-2 px-6 rounded-full w-full shadow text-center transition duration-300"
                 >
-                  Reservar
+                  Reservar por ${totalPagar}
                 </button>
               </div>
             )}
@@ -208,7 +212,11 @@ const ReservaStep2: React.FC = () => {
               <p className="text-gray-500 mb-6">{cancha.descripcion}</p>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <Card icon={DollarSign} title={`$${tarifa?.tarifa ?? 'N/D'}`} subtitle="Costo del alquiler" />
+                <Card
+                  icon={DollarSign}
+                  title={`$${totalPagar}`}
+                  subtitle={`Tarifa: $${tarifaValor.toFixed(2)} por hora`}
+                />
                 <Card icon={Clock} title={duracion} subtitle="Duración" />
                 <Card icon={Calendar} title={fechaBonita} subtitle="Fecha" />
                 <Card

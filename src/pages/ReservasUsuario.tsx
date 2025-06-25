@@ -58,7 +58,7 @@ export default function ReservasUsuario() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {reservas.map(reserva => {
-              const fechaFormateada = format(new Date(reserva.fecha), "d 'de' MMMM, yyyy", { locale: es });
+              const fechaFormateada = format(new Date(`${reserva.fecha}T00:00:00`), "d 'de' MMMM, yyyy", { locale: es });
               const pasada = esPasada(reserva);
 
               return (

@@ -78,7 +78,7 @@ const ReservaStep3: React.FC = () => {
       });
 
       // Marcar como pagado
-      const res = await axios.put(
+      await axios.put(
         `/api/reservas/pago_realizado?ReservasIds=${ids}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }

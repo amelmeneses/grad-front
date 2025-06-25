@@ -211,7 +211,21 @@ const ReservaStep2: React.FC = () => {
                 <Card icon={DollarSign} title={`$${tarifa?.tarifa ?? 'N/D'}`} subtitle="Costo del alquiler" />
                 <Card icon={Clock} title={duracion} subtitle="Duración" />
                 <Card icon={Calendar} title={fechaBonita} subtitle="Fecha" />
-                <Card icon={AlarmClock} title={seleccionados.join(', ') || 'Seleccionar'} subtitle="Horarios" />
+                <Card
+                  icon={AlarmClock}
+                  title={
+                    <div className="flex flex-col space-y-1">
+                      {seleccionados.length === 0 ? (
+                        <span>Seleccionar</span>
+                      ) : (
+                        seleccionados.map((bloque, index) => (
+                          <span key={index}>{bloque}</span>
+                        ))
+                      )}
+                    </div>
+                  }
+                  subtitle="Horarios"
+                />
                 <Card icon={MapPin} title={cancha.ubicacion} subtitle="Ubicación" />
                 <Card icon={Globe} title="Ecuador" subtitle="Zona horaria" />
                 <div className="col-span-2 flex justify-center">

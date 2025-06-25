@@ -4,7 +4,7 @@ import { LucideIcon } from 'lucide-react';
 
 interface Props {
   icon: LucideIcon;
-  title: string;
+  title: React.ReactNode;
   subtitle: string;
   className?: string;
 }

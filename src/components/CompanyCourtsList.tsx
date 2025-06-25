@@ -28,7 +28,7 @@ interface Option {
 
 export default function CompanyCourtsList() {
   const navigate = useNavigate();
-  const [userId, setUserId] = useState<number | null>(null);
+  // const [userId, setUserId] = useState<number | null>(null);
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [selectedEmpresa, setSelectedEmpresa] = useState<Option | null>(null);
   const [courts, setCourts] = useState<Court[]>([]);
@@ -67,7 +67,7 @@ export default function CompanyCourtsList() {
 
     try {
       const { id } = jwtDecode<TokenPayload>(token);
-      setUserId(id);
+      // setUserId(id);
 
       axios.get<Empresa[]>(`/api/empresas?usuario_id=${id}`, {
         headers: { Authorization: `Bearer ${token}` },

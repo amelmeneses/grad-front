@@ -1,4 +1,3 @@
-// src/pages/ReservaConfirmada.tsx
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Card from '../components/ReservaInfoCard';
@@ -28,11 +27,12 @@ const ReservaConfirmada: React.FC = () => {
 
   const { cancha, pago, horarios, fecha } = reserva;
 
+  // Calcular duración total
   const totalMs = horarios.reduce((acc: number, bloque: string) => {
     const [ini, fin] = bloque.split(' - ');
     const hIni = new Date(`1970-01-01T${ini}:00`);
     const hFin = new Date(`1970-01-01T${fin}:00`);
-      return acc + (hFin.getTime() - hIni.getTime());
+    return acc + (hFin.getTime() - hIni.getTime());
   }, 0);
 
   const totalMin = Math.floor(totalMs / (1000 * 60));
@@ -47,7 +47,7 @@ const ReservaConfirmada: React.FC = () => {
     <>
       <Navbar />
       <div className="pt-32 px-6 md:px-16 max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold mb-10 text-center">RESERVA REALIZADA</h1>
+        <h1 className="text-3xl text-gray-800 font-bold mb-10 text-center">RESERVA REALIZADA</h1>
         <div className="bg-white rounded-3xl shadow-lg grid md:grid-cols-2 p-10 gap-10">
           {/* Panel Izquierdo */}
           <div className="text-gray-800 text-md leading-7">
@@ -78,7 +78,11 @@ const ReservaConfirmada: React.FC = () => {
               <Card icon={DollarSign} title={`$${pago.total}`} subtitle="Costo del alquiler" />
               <Card icon={Clock} title={duracion} subtitle="Duración" />
               <Card icon={Calendar} title={fecha} subtitle="Fecha" />
-              <Card icon={AlarmClock} title={horarios.join(', ')} subtitle="Horarios" />
+              <Card
+                icon={AlarmClock}
+                title={horarios.join(', ')}
+                subtitle="Horarios"
+              />
               <Card icon={MapPin} title={cancha.ubicacion} subtitle="Ubicación" />
               <Card icon={Globe} title="Ecuador" subtitle="Zona horaria" />
               <div className="col-span-2 flex justify-center">

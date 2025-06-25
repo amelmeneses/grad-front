@@ -1,5 +1,4 @@
-// src/components/Navbar.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { FaSignOutAlt } from 'react-icons/fa';
@@ -22,10 +21,12 @@ interface TokenPayload {
 
 const Navbar: React.FC = () => {
   const { pathname } = useLocation();
-  const navigate     = useNavigate();
-  const [menuOpen,   setMenuOpen] = useState(false);
-  const [userName,   setUserName] = useState<string|null>(null);
-  const [roleId,     setRoleId]   = useState<number|null>(null);
+  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [roleId, setRoleId] = useState<number | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -41,6 +42,16 @@ const Navbar: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleLogout = () => {
     if (window.confirm('¿Está seguro de cerrar sesión?')) {
       localStorage.removeItem('token');
@@ -51,12 +62,11 @@ const Navbar: React.FC = () => {
   return (
     <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
       <div className="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
         <Link to="/" className="flex-shrink-0">
           <img src={logo} alt="PlayBooker Logo" className="h-12 w-auto" />
         </Link>
 
-        {/* Desktop Links */}
+        {/* Desktop */}
         <div className="hidden md:flex flex-1 items-center justify-between">
           {links.map(l => (
             <Link
@@ -73,27 +83,58 @@ const Navbar: React.FC = () => {
           ))}
 
           {userName && roleId ? (
-            <div className="flex items-center space-x-2">
-              <Link
-                to={
-                  roleId === 1 ? '/dashboard-admin' :
-                  roleId === 2 ? '/mi-cuenta' :
-                  roleId === 3 ? '/dashboard-company' : '/'
-                }
-                className="py-2 px-6 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
-                           text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
-              >
-                {userName}
-              </Link>
-              {/* Separate logout icon */}
-              <button
-                onClick={handleLogout}
-                title="Cerrar Sesión"
-                className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
-              >
-                <FaSignOutAlt className="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
+            roleId === 2 ? (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="py-2 px-6 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                             text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
+                >
+                  {userName}
+                </button>
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg divide-y divide-gray-200 z-50">
+                    <Link
+                      to="/mi-cuenta"
+                      onClick={() => setDropdownOpen(false)}
+                      className="block py-2 px-4 text-sm text-gray-800 hover:bg-gray-100"
+                    >
+                      Mi cuenta
+                    </Link>
+                    <Link
+                      to="/mis-reservas"
+                      onClick={() => setDropdownOpen(false)}
+                      className="block py-2 px-4 text-sm text-gray-800 hover:bg-gray-100"
+                    >
+                      Mis reservas
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left py-2 px-4 text-sm text-gray-800 hover:bg-gray-100"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link
+                  to={roleId === 1 ? '/dashboard-admin' : '/dashboard-company'}
+                  className="py-2 px-6 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                             text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
+                >
+                  {userName}
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  title="Cerrar Sesión"
+                  className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+                >
+                  <FaSignOutAlt className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            )
           ) : (
             <Link
               to="/login"
@@ -105,7 +146,7 @@ const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile Hamburger */}
+        {/* Mobile */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className={`md:hidden hamburger ${menuOpen ? 'open' : ''}`}
@@ -117,10 +158,11 @@ const Navbar: React.FC = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu Content */}
       <div
-        className={`fixed inset-0 bg-white z-40 transform transition-transform duration-300
-          ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        className={`fixed inset-0 bg-white z-40 transform transition-transform duration-300 ${
+          menuOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
       >
         <div className="flex flex-col items-center justify-center h-full space-y-8">
           {links.map(l => (
@@ -144,7 +186,7 @@ const Navbar: React.FC = () => {
                 to={
                   roleId === 1 ? '/dashboard-admin' :
                   roleId === 2 ? '/mi-cuenta' :
-                  roleId === 3 ? '/dashboard-empresa' : '/'
+                  '/dashboard-company'
                 }
                 onClick={() => setMenuOpen(false)}
                 className="block w-full text-center py-3 px-12 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
@@ -152,8 +194,20 @@ const Navbar: React.FC = () => {
               >
                 {userName}
               </Link>
+              {roleId === 2 && (
+                <Link
+                  to="/mis-reservas"
+                  onClick={() => setMenuOpen(false)}
+                  className="block w-full text-center py-3 px-12 bg-gray-100 text-gray-800 font-medium rounded-full hover:bg-gray-200 transition"
+                >
+                  Mis reservas
+                </Link>
+              )}
               <button
-                onClick={() => { setMenuOpen(false); handleLogout(); }}
+                onClick={() => {
+                  setMenuOpen(false);
+                  handleLogout();
+                }}
                 title="Cerrar Sesión"
                 className="mx-auto p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
               >

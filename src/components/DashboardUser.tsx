@@ -50,7 +50,7 @@ const DashboardUser: React.FC = () => {
 
             {/* Historial de Reservas */}
             <button
-              onClick={() => navigate('/reservas-historial')}
+              onClick={() => navigate('/mis-reservas')}
               className="py-16 bg-white rounded-2xl shadow-lg hover:shadow-2xl
                          transition flex items-center justify-center"
             >

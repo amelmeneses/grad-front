@@ -1,53 +1,52 @@
-// src/App.tsx
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-import LoginPage        from './components/LoginPage';
-import RegisterPage     from './components/RegisterPage';
-import ProtectedRoute   from './components/ProtectedRoute';
-import Forbidden        from './components/Forbidden';
-import ActivatePage     from './components/ActivatePage';
-import MiCuentaPage     from './components/MiCuentaPage';
+import LoginPage from './components/LoginPage';
+import RegisterPage from './components/RegisterPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import Forbidden from './components/Forbidden';
+import ActivatePage from './components/ActivatePage';
+import MiCuentaPage from './components/MiCuentaPage';
 
-import AdminDashboard     from './components/AdminDashboard';
-import DashboardUser      from './components/DashboardUser';
-import ManageUsers        from './components/ManageUsers';
-import UserForm           from './components/UserForm';
-import ManageCompanies    from './components/ManageCompanies';
-import CompanyForm        from './components/CompanyForm';
-import ManageCourts       from './components/ManageCourts';
-import CourtForm          from './components/courts/CourtForm';
-import CompanyDashboard   from './components/CompanyDashboard';
-import UserDashboard      from './components/UserDashboard';
+import AdminDashboard from './components/AdminDashboard';
+import DashboardUser from './components/DashboardUser';
+import ManageUsers from './components/ManageUsers';
+import UserForm from './components/UserForm';
+import ManageCompanies from './components/ManageCompanies';
+import CompanyForm from './components/CompanyForm';
+import ManageCourts from './components/ManageCourts';
+import CourtForm from './components/courts/CourtForm';
+import CompanyDashboard from './components/CompanyDashboard';
 import ManageUserCompanies from './components/ManageUserCompanies';
 
-import LandingPage        from './pages/LandingPage';
-import AboutAs            from './pages/AboutAs';
-import ServicesSection    from './pages/ServicesSection';
-import HelpSection        from './pages/HelpSection';
-import TermsPage          from './pages/TermsAndConditions';
-import PrivacyPolicy      from './pages/PrivacyPolicy';
-import ReservaConfirmada      from './pages/ReservaConfirmada';
+import LandingPage from './pages/LandingPage';
+import AboutAs from './pages/AboutAs';
+import ServicesSection from './pages/ServicesSection';
+import HelpSection from './pages/HelpSection';
+import TermsPage from './pages/TermsAndConditions';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import ReservaConfirmada from './pages/ReservaConfirmada';
+import ReservasUsuario from './pages/ReservasUsuario';
 
-import TariffList         from './components/TariffList';
-import TariffForm         from './components/TariffForm';
-import OpenHoursList      from './components/OpenHoursList';
-import OpenHoursForm      from './components/OpenHoursForm';
-import CourtsList         from './components/CourtsList';
-import CompanyCourtsList  from './components/CompanyCourtsList';
+import TariffList from './components/TariffList';
+import TariffForm from './components/TariffForm';
+import OpenHoursList from './components/OpenHoursList';
+import OpenHoursForm from './components/OpenHoursForm';
+import CourtsList from './components/CourtsList';
+import CompanyCourtsList from './components/CompanyCourtsList';
 
-import ReservasPage       from './components/ReservasPage';
-import CanchasPorDeporte  from './components/CanchasPorDeporte';
-import CanchaDetalle      from './components/CanchaDetalle';
-import ReservaStep1       from './components/ReservaStep1';
-import ReservaStep2       from './components/ReservaStep2';
-import ReservaStep3       from './components/ReservaStep3';
-import ReservasList       from './components/ReservasList';
+import ReservasPage from './components/ReservasPage';
+import CanchasPorDeporte from './components/CanchasPorDeporte';
+import CanchaDetalle from './components/CanchaDetalle';
+import ReservaStep1 from './components/ReservaStep1';
+import ReservaStep2 from './components/ReservaStep2';
+import ReservaStep3 from './components/ReservaStep3';
+import ReservasList from './components/ReservasList';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Public */}
+        {/* Público */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -60,7 +59,7 @@ function App() {
 
         {/* Footer redirects */}
         <Route path="/reservas" element={<ReservasPage />} />
-        <Route path="/perfil"  element={<Navigate to="/login" replace />} />
+        <Route path="/perfil" element={<Navigate to="/login" replace />} />
         <Route path="/contacto" element={<Navigate to="/ayuda" replace />} />
 
         {/* Protected — Reservas Usuario */}
@@ -112,6 +111,14 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/mis-reservas"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <ReservasUsuario />
+            </ProtectedRoute>
+          }
+        />
 
         {/* Protected — User */}
         <Route
@@ -119,6 +126,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={[2]}>
               <DashboardUser />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mi-cuenta"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <MiCuentaPage />
             </ProtectedRoute>
           }
         />
@@ -279,15 +294,7 @@ function App() {
           }
         />
 
-        {/* Protected — Company & User */}
-        <Route
-          path="/mi-cuenta"
-          element={
-            <ProtectedRoute allowedRoles={[2]}>
-              <MiCuentaPage />
-            </ProtectedRoute>
-          }
-        />
+        {/* Company views */}
         <Route
           path="/dashboard-company"
           element={
@@ -312,24 +319,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-          <Route
-              path="/company/reservas"
-              element={
-                <ProtectedRoute allowedRoles={[3]}>
-                  <ReservasList />
-                </ProtectedRoute>
-              }
-           />
         <Route
-          path="/dashboard-user"
+          path="/company/reservas"
           element={
-            <ProtectedRoute allowedRoles={[2]}>
-              <UserDashboard />
+            <ProtectedRoute allowedRoles={[3]}>
+              <ReservasList />
             </ProtectedRoute>
           }
         />
 
-        {/* 403 & fallback */}
+        {/* Fallback y errores */}
         <Route path="/403" element={<Forbidden />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>

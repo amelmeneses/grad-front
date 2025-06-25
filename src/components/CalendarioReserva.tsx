@@ -1,31 +1,30 @@
-import React, { useState } from 'react';
+// src/components/CalendarioReserva.tsx
+import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import type { CalendarProps } from 'react-calendar';
 import { format, isBefore, startOfDay } from 'date-fns';
 import 'react-calendar/dist/Calendar.css';
 import './CalendarioReserva.css';
+import axios from 'axios';
 
 interface CalendarioReservaProps {
   onDateSelect: (fecha: string) => void;
+  canchaId: string;
 }
 
-// JSON hardcodeado de fechas disponibles y no disponibles por mes
-const disponibilidad: Record<
-  string,
-  { disponibles: string[]; no_disponibles: string[] }
-> = {
-  '2025-06': {
-    disponibles: ['2025-06-03', '2025-06-05', '2025-06-10', '2025-06-14', '2025-06-22', '2025-06-30'],
-    no_disponibles: ['2025-06-01', '2025-06-06', '2025-06-13', '2025-06-20', '2025-06-27'],
-  },
-  '2025-07': {
-    disponibles: ['2025-07-02', '2025-07-08', '2025-07-15', '2025-07-19', '2025-07-26'],
-    no_disponibles: ['2025-07-01', '2025-07-04', '2025-07-10', '2025-07-16', '2025-07-28'],
-  },
-};
-
-const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect }) => {
+const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect, canchaId }) => {
   const [value, setValue] = useState<Date | null>(new Date());
+  const [disponibilidad, setDisponibilidad] = useState<Record<string, { disponibles: string[]; no_disponibles: string[] }>>({});
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios
+      .get(`/api/canchas/${canchaId}/disponibilidad`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setDisponibilidad(res.data))
+      .catch((err) => console.error('Error al cargar disponibilidad:', err));
+  }, [canchaId]);
 
   const handleChange: CalendarProps['onChange'] = (date) => {
     if (date instanceof Date) {

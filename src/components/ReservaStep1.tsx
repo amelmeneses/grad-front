@@ -63,7 +63,7 @@ const ReservaStep1: React.FC = () => {
             {/* Calendario (lado izquierdo) */}
             <div className="bg-white p-6 rounded-xl shadow-xl">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Selecciona una fecha:</h2>
-              <CalendarioReserva onDateSelect={(date) => setFecha(date)} />
+              <CalendarioReserva canchaId={canchaId!} onDateSelect={(date) => setFecha(date)} />
             </div>
 
             {/* Panel derecho */}

@@ -51,8 +51,19 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const decoded = jwtDecode<TokenPayload>(token);
-    setRole(decoded.role);
+    if (!token) {
+      setError('No se encontró el token de autenticación.');
+      setLoading(false);
+      return;
+    }
+    try {
+      const decoded = jwtDecode<TokenPayload>(token);
+      setRole(decoded.role);
+    } catch (e) {
+      setError('Token inválido. Por favor inicia sesión nuevamente.');
+      setLoading(false);
+      return;
+    }
     axios.get<User[]>('/api/users', {
       headers: { Authorization: `Bearer ${token}` },
     })

@@ -1,9 +1,9 @@
-// src/components/ReservasList.tsx
 import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import AdminNav from './AdminNav';
 import Navbar from './Navbar';
 import { FiXCircle } from 'react-icons/fi';
+import { parseISO } from 'date-fns';
 
 interface Cancha {
   id: number;
@@ -40,9 +40,16 @@ export default function ReservasList() {
       const res = await axios.get<Reserva[]>('/api/reservas', {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setReservas(res.data);
+
+      // Arreglo al campo fecha
+      const reservasFix = res.data.map(r => ({
+        ...r,
+        fecha: parseISO(r.fecha).toISOString()
+      }));
+
+      setReservas(reservasFix);
       const unique = Array.from(
-        new Map(res.data.map(r => [r.cancha.id, r.cancha])).values()
+        new Map(reservasFix.map(r => [r.cancha.id, r.cancha])).values()
       );
       setCanchas(unique);
       setError(null);
@@ -82,7 +89,7 @@ export default function ReservasList() {
       : reservas.filter(r => r.cancha.id === filtroCancha);
 
   if (loading) return <div className="p-8 text-gray-700">Cargando reservas…</div>;
-  if (error)   return <div className="p-8 text-red-500">{error}</div>;
+  if (error) return <div className="p-8 text-red-500">{error}</div>;
 
   return (
     <>
@@ -153,16 +160,16 @@ export default function ReservasList() {
                       key={res.id}
                       className="border-b hover:bg-gray-50 text-center"
                     >
-                      <td className="p-3 text-gray-800">{res.id}</td>
-                      <td className="p-3 text-gray-800">{res.usuario_id}</td>
-                      <td className="p-3 text-gray-800">{res.cancha.nombre}</td>
-                      <td className="p-3 text-gray-800">
+                      <td className="p-3 text-gray-800 text-left">{res.id}</td>
+                      <td className="p-3 text-gray-800 text-left">{res.usuario_id}</td>
+                      <td className="p-3 text-gray-800 text-left">{res.cancha.nombre}</td>
+                      <td className="p-3 text-gray-800 text-left">
                         {new Date(res.fecha).toLocaleDateString()}
                       </td>
-                      <td className="p-3 text-gray-800">
+                      <td className="p-3 text-gray-800 text-left">
                         {`${res.hora_inicio} - ${res.hora_fin}`}
                       </td>
-                      <td className="p-3">
+                      <td className="p-3 text-left">
                         {(() => {
                           switch (res.estado) {
                             case 'cancelada':

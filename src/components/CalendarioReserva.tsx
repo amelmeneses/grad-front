@@ -13,7 +13,7 @@ interface CalendarioReservaProps {
 }
 
 const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect, canchaId }) => {
-  const [value, setValue] = useState<Date | null>(new Date());
+  const [value, setValue] = useState<Date>(new Date());
   const [disponibilidad, setDisponibilidad] = useState<Record<string, { disponibles: string[]; no_disponibles: string[] }>>({});
 
   useEffect(() => {
@@ -26,34 +26,27 @@ const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect, can
       .catch((err) => console.error('Error al cargar disponibilidad:', err));
   }, [canchaId]);
 
+  // hoy y mes siguiente
+  const hoy = startOfDay(new Date());
+  const mesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 1, hoy.getDate());
+
   const handleChange: CalendarProps['onChange'] = (date) => {
     if (date instanceof Date) {
       setValue(date);
-      const formatted = format(date, 'yyyy-MM-dd');
-      onDateSelect(formatted);
+      onDateSelect(format(date, 'yyyy-MM-dd'));
     }
   };
 
   const tileClassName: CalendarProps['tileClassName'] = ({ date, view }) => {
     if (view !== 'month') return '';
 
-    const hoy = startOfDay(new Date());
     const fechaStr = format(date, 'yyyy-MM-dd');
-    const mesClave = fechaStr.slice(0, 7);
-    const datosMes = disponibilidad[mesClave];
+    const mesClave  = fechaStr.slice(0, 7);
+    const datosMes  = disponibilidad[mesClave];
 
-    if (isBefore(date, hoy)) {
-      return 'vencido';
-    }
-
-    if (datosMes?.disponibles.includes(fechaStr)) {
-      return 'disponible';
-    }
-
-    if (datosMes?.no_disponibles.includes(fechaStr)) {
-      return 'no-disponible';
-    }
-
+    if (isBefore(date, hoy))                  return 'vencido';
+    if (datosMes?.disponibles.includes(fechaStr))    return 'disponible';
+    if (datosMes?.no_disponibles.includes(fechaStr)) return 'no-disponible';
     return '';
   };
 
@@ -66,6 +59,11 @@ const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect, can
         locale="es"
         className="w-full"
         tileClassName={tileClassName}
+        minDate={hoy}
+        maxDate={mesSiguiente}
+        // deshabilita salto rápido de año
+        prev2Label={null}
+        next2Label={null}
       />
       <div className="mt-4 flex justify-center gap-4 text-sm text-gray-600">
         <div className="flex items-center gap-1">

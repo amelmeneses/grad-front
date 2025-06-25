@@ -38,6 +38,7 @@ import ReservasPage       from './components/ReservasPage';
 import CanchasPorDeporte  from './components/CanchasPorDeporte';
 import CanchaDetalle      from './components/CanchaDetalle';
 import ReservaStep1       from './components/ReservaStep1';
+import ReservaStep2       from './components/ReservaStep2';
 import ReservasList       from './components/ReservasList';
 
 function App() {
@@ -82,6 +83,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={[2]}>
               <ReservaStep1 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reservar/:canchaId/:date"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <ReservaStep2 />
             </ProtectedRoute>
           }
         />

@@ -1,3 +1,5 @@
+// src/components/ReservaStep1.tsx
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -63,7 +65,13 @@ const ReservaStep1: React.FC = () => {
             {/* Calendario (lado izquierdo) */}
             <div className="bg-white p-6 rounded-xl shadow-xl">
               <h2 className="text-xl font-semibold text-gray-800 mb-4">Selecciona una fecha:</h2>
-              <CalendarioReserva canchaId={canchaId!} onDateSelect={(date) => setFecha(date)} />
+              <CalendarioReserva
+                canchaId={canchaId!}
+                onDateSelect={(date) => {
+                  setFecha(date);
+                  navigate(`/reservar/${canchaId}/${date}`);
+                }}
+              />
             </div>
 
             {/* Panel derecho */}
@@ -86,16 +94,6 @@ const ReservaStep1: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              <button
-                disabled={!fecha}
-                onClick={() => {
-                  if (fecha) navigate(`/reservar/${canchaId}/horario?fecha=${fecha}`);
-                }}
-                className="mt-6 w-full bg-gradient-to-r from-[#0B91C1] to-[#EB752B] text-white px-6 py-2 rounded-full shadow hover:opacity-90 transition"
-              >
-                Continuar Reserva
-              </button>
             </div>
           </div>
         )}

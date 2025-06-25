@@ -70,7 +70,7 @@ export default function ReservasList() {
   }, [fetchReservas]);
 
   const cancelReserva = async (id: number, estado: string) => {
-    if (estado === 'cancelada') return;
+    if (estado === 'canceled') return;
     if (!window.confirm('¿Deseas cancelar esta reserva?')) return;
     const token = localStorage.getItem('token')!;
     try {
@@ -172,7 +172,7 @@ export default function ReservasList() {
                       <td className="p-3 text-left">
                         {(() => {
                           switch (res.estado) {
-                            case 'cancelada':
+                            case 'canceled':
                               return (
                                 <span className="inline-block px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full">
                                   Cancelada
@@ -202,12 +202,12 @@ export default function ReservasList() {
                       <td className="p-3 text-center">
                         <button
                           title={
-                            res.estado === 'cancelada'
+                            res.estado === 'canceled'
                               ? 'Reserva cancelada'
                               : 'Cancelar Reserva'
                           }
                           onClick={() => cancelReserva(res.id, res.estado)}
-                          disabled={res.estado === 'cancelada'}
+                          disabled={res.estado === 'canceled'}
                           className={`bg-white p-2 rounded-lg border border-gray-200 hover:bg-gray-100 transition ${
                             res.estado === 'cancelada'
                               ? 'opacity-50 cursor-not-allowed'
@@ -216,7 +216,7 @@ export default function ReservasList() {
                         >
                           <FiXCircle
                             className={`text-red-500 ${
-                              res.estado === 'cancelada'
+                              res.estado === 'canceled'
                                 ? 'text-red-300'
                                 : ''
                             }`}

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { FiGrid, FiUser, FiInfo } from 'react-icons/fi';
+import { FiGrid, FiUser } from 'react-icons/fi';
 import { MdSportsBasketball, MdOutlineStadium, MdOutlineEventAvailable } from 'react-icons/md';
 
 interface TokenPayload {
@@ -35,24 +35,24 @@ export default function AdminNav() {
   }, []);
 
   const adminMenu: MenuItem[] = [
-    { to: '/dashboard-admin',  label: 'Dashboard', icon: <FiGrid size={20} /> },
-    { to: '/admin/users',      label: 'Usuarios',  icon: <FiUser size={20} /> },
-    { to: '/admin/empresas',   label: 'Empresas',  icon: <MdSportsBasketball size={20} /> },
-    { to: '/admin/canchas',    label: 'Canchas',   icon: <MdOutlineStadium size={20} /> },
+    { to: '/dashboard-admin', label: 'Dashboard', icon: <FiGrid size={20} /> },
+    { to: '/admin/users', label: 'Usuarios', icon: <FiUser size={20} /> },
+    { to: '/admin/empresas', label: 'Empresas', icon: <MdSportsBasketball size={20} /> },
+    { to: '/admin/canchas', label: 'Canchas', icon: <MdOutlineStadium size={20} /> },
+    { to: '/admin/reservas', label: 'Reservas', icon: <MdOutlineEventAvailable size={20} /> },
   ];
 
   const companyMenu: MenuItem[] = [
-    { to: '/dashboard-company',  label: 'Dashboard', icon: <FiGrid size={20} /> },
-    { to: '/company/empresas',       label: 'Empresas', icon: <MdSportsBasketball size={20} /> },
-    { to: '/company/canchas',    label: 'Canchas', icon: <MdOutlineStadium size={20} /> },
-    { to: '/company/reservas',   label: 'Reservas', icon: <MdOutlineEventAvailable size={20} /> },
+    { to: '/dashboard-company', label: 'Dashboard', icon: <FiGrid size={20} /> },
+    { to: '/company/empresas', label: 'Empresas', icon: <MdSportsBasketball size={20} /> },
+    { to: '/company/canchas', label: 'Canchas', icon: <MdOutlineStadium size={20} /> },
+    { to: '/company/reservas', label: 'Reservas', icon: <MdOutlineEventAvailable size={20} /> },
   ];
 
   const menuItems = role === 1 ? adminMenu : role === 3 ? companyMenu : [];
 
   return (
     <aside className="w-64 bg-white border-r h-screen p-8 flex flex-col justify-between">
-      {/* Menú */}
       <div>
         <nav>
           <ul className="space-y-4">

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import type { CalendarProps } from 'react-calendar';
-import { format, isBefore, startOfDay } from 'date-fns';
+import { format, isBefore, startOfDay, endOfMonth, addMonths } from 'date-fns';
 import 'react-calendar/dist/Calendar.css';
 import './CalendarioReserva.css';
 import axios from 'axios';
@@ -22,13 +22,13 @@ const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect, can
       .get(`/api/canchas/${canchaId}/disponibilidad`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setDisponibilidad(res.data))
-      .catch((err) => console.error('Error al cargar disponibilidad:', err));
+      .then(res => setDisponibilidad(res.data))
+      .catch(err => console.error('Error al cargar disponibilidad:', err));
   }, [canchaId]);
 
-  // hoy y mes siguiente
+  // Rango: desde hoy hasta FIN del mes siguiente
   const hoy = startOfDay(new Date());
-  const mesSiguiente = new Date(hoy.getFullYear(), hoy.getMonth() + 1, hoy.getDate());
+  const finMesSiguiente = endOfMonth(addMonths(hoy, 1));
 
   const handleChange: CalendarProps['onChange'] = (date) => {
     if (date instanceof Date) {
@@ -41,13 +41,25 @@ const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect, can
     if (view !== 'month') return '';
 
     const fechaStr = format(date, 'yyyy-MM-dd');
-    const mesClave  = fechaStr.slice(0, 7);
-    const datosMes  = disponibilidad[mesClave];
+    const datosMes = disponibilidad[fechaStr.slice(0,7)];
 
-    if (isBefore(date, hoy))                  return 'vencido';
-    if (datosMes?.disponibles.includes(fechaStr))    return 'disponible';
+    if (isBefore(date, hoy)) return 'vencido';
+    if (datosMes?.disponibles.includes(fechaStr)) return 'disponible';
     if (datosMes?.no_disponibles.includes(fechaStr)) return 'no-disponible';
     return '';
+  };
+
+  const tileDisabled: CalendarProps['tileDisabled'] = ({ date, view }) => {
+    if (view !== 'month') return false;
+    const fechaStr = format(date, 'yyyy-MM-dd');
+    const datosMes = disponibilidad[fechaStr.slice(0,7)];
+
+    // deshabilita: pasados, fuera de rango, o explícitamente no disponibles
+    return (
+      isBefore(date, hoy) ||
+      date > finMesSiguiente ||
+      !!datosMes?.no_disponibles.includes(fechaStr)
+    );
   };
 
   return (
@@ -59,9 +71,10 @@ const CalendarioReserva: React.FC<CalendarioReservaProps> = ({ onDateSelect, can
         locale="es"
         className="w-full"
         tileClassName={tileClassName}
+        tileDisabled={tileDisabled}
         minDate={hoy}
-        maxDate={mesSiguiente}
-        // deshabilita salto rápido de año
+        maxDate={finMesSiguiente}
+        // quita saltos rápidos de año
         prev2Label={null}
         next2Label={null}
       />

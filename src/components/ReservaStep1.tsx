@@ -19,7 +19,7 @@ import {
 
 interface Tarifa {
   tarifa: number;
-  default: boolean;
+  es_default: boolean;
 }
 
 interface Cancha {
@@ -50,7 +50,7 @@ const ReservaStep1: React.FC = () => {
       .catch(() => setError('No se pudo cargar la información de la cancha.'));
   }, [canchaId]);
 
-  const tarifa = cancha?.tarifas?.find(t => t.default);
+  const tarifa = cancha?.tarifas?.find(t => t.es_default);
 
   return (
     <>

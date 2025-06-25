@@ -30,7 +30,7 @@ export default function TariffForm() {
   const [tariff, setTariff] = useState<Tariff>({
     cancha_id: Number(canchaId!),
     dia_semana: null,
-    default: false,
+    es_default: false,
     hora_inicio: '',
     hora_fin: '',
     tarifa: 0,
@@ -67,7 +67,7 @@ export default function TariffForm() {
       .then(res => {
         const data = res.data;
         setTariff({ ...data, tarifa: Number(data.tarifa) });
-        setInitialDefault(Boolean(data.default));
+        setInitialDefault(Boolean(data.es_default));
         setErrorMsg(null);
       })
       .catch(() => setErrorMsg('No se pudo cargar la tarifa'))
@@ -195,10 +195,10 @@ export default function TariffForm() {
                 <input
                   id="default"
                   type="checkbox"
-                  checked={tariff.default}
+                  checked={tariff.es_default}
                   disabled={isDefaultAndLocked}
                   onChange={e =>
-                    setTariff({ ...tariff, default: e.currentTarget.checked })
+                    setTariff({ ...tariff, es_default: e.currentTarget.checked })
                   }
                   className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded"
                 />

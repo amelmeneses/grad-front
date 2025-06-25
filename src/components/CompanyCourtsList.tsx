@@ -108,7 +108,7 @@ export default function CompanyCourtsList() {
       const res = await axios.get<Tariff[]>(`/api/canchas/${c.id}/tarifas`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      const def = res.data.find(x => x.default);
+      const def = res.data.find(x => x.es_default);
       if (def) m[c.id!] = Number(def.tarifa);
     })).then(() => setPrices(m));
   }, [courts]);

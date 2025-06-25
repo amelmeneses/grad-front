@@ -105,7 +105,7 @@ export default function CourtsList() {
         `/api/canchas/${c.id}/tarifas`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      const def = tr.data.find(x => x.default);
+      const def = tr.data.find(x => x.es_default);
       if (def) m[c.id!] = Number(def.tarifa);
     })).then(() => setPrices(m));
   }, [courts]);

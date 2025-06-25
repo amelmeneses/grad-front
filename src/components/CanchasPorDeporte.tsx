@@ -7,7 +7,7 @@ import Navbar from './Navbar';
 interface Tarifa {
   id: number;
   tarifa: number;
-  default: boolean;
+  es_default: boolean;
 }
 
 interface Cancha {
@@ -59,7 +59,7 @@ const CanchasPorDeporte: React.FC = () => {
     const max = parseFloat(precioMax);
 
     const filtradas = canchas.filter((cancha) => {
-      const tarifaDefault = cancha.tarifas?.find((t) => t.default);
+      const tarifaDefault = cancha.tarifas?.find((t) => t.es_default);
       const cumpleNombre = cancha.nombre.toLowerCase().includes(nombreFiltro.toLowerCase());
       const cumpleUbicacion = cancha.ubicacion.toLowerCase().includes(ubicacionFiltro.toLowerCase());
       const cumplePrecio = tarifaDefault
@@ -110,7 +110,7 @@ const CanchasPorDeporte: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
           {filteredCanchas.map((cancha) => {
-            const tarifaDefault = cancha.tarifas?.find((t) => t.default);
+            const tarifaDefault = cancha.tarifas?.find((t) => t.es_default);
 
             return (
               <div

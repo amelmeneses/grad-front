@@ -7,7 +7,7 @@ import Navbar from './Navbar';
 interface Tarifa {
   id: number;
   tarifa: number;
-  default: boolean;
+  es_default: boolean;
 }
 
 interface Cancha {
@@ -44,7 +44,7 @@ const CanchaDetalle: React.FC = () => {
       .catch(() => setError('No se pudo cargar la información de la cancha.'));
   }, [id, navigate]);
 
-  const tarifa = cancha?.tarifas?.find(t => t.default);
+  const tarifa = cancha?.tarifas?.find(t => t.es_default);
 
   return (
     <>

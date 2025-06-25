@@ -26,6 +26,7 @@ import ServicesSection    from './pages/ServicesSection';
 import HelpSection        from './pages/HelpSection';
 import TermsPage          from './pages/TermsAndConditions';
 import PrivacyPolicy      from './pages/PrivacyPolicy';
+import ReservaConfirmada      from './pages/ReservaConfirmada';
 
 import TariffList         from './components/TariffList';
 import TariffForm         from './components/TariffForm';
@@ -39,6 +40,7 @@ import CanchasPorDeporte  from './components/CanchasPorDeporte';
 import CanchaDetalle      from './components/CanchaDetalle';
 import ReservaStep1       from './components/ReservaStep1';
 import ReservaStep2       from './components/ReservaStep2';
+import ReservaStep3       from './components/ReservaStep3';
 import ReservasList       from './components/ReservasList';
 
 function App() {
@@ -91,6 +93,22 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={[2]}>
               <ReservaStep2 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reservar/:canchaId/pago"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <ReservaStep3 />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/reserva_confirmada"
+          element={
+            <ProtectedRoute allowedRoles={[2]}>
+              <ReservaConfirmada />
             </ProtectedRoute>
           }
         />

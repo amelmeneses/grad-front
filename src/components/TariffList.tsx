@@ -22,7 +22,7 @@ const daysOfWeek = [
   { value: 'sunday',    label: 'Domingo' },
 ];
 
-type SortKey = keyof Pick<Tariff, 'id' | 'dia_semana' | 'default' | 'hora_inicio' | 'hora_fin' | 'tarifa'>;
+type SortKey = keyof Pick<Tariff, 'id' | 'dia_semana' | 'es_default' | 'hora_inicio' | 'hora_fin' | 'tarifa'>;
 
 export default function TariffList() {
   const { empresaId, canchaId } = useParams<{ empresaId: string; canchaId: string }>();
@@ -71,9 +71,10 @@ export default function TariffList() {
 
   const makeDefault = async (id: number) => {
     const token = localStorage.getItem('token')!;
+    console.log(`Setting tarifa ${id} as default for cancha ${canchaNum}`);
     await axios.put(
       `/api/canchas/${canchaNum}/tarifas/${id}`,
-      { default: true },
+      { es_default: true },
       { headers:{ Authorization:`Bearer ${token}` } }
     );
     fetchAll();
@@ -91,8 +92,8 @@ export default function TariffList() {
           const ib = b.dia_semana ? daysOfWeek.findIndex(d => d.value === b.dia_semana) : daysOfWeek.length;
           cmp = ia - ib;
           break;
-        case 'default':
-          cmp = (a.default === b.default) ? 0 : (a.default ? -1 : 1);
+        case 'es_default':
+          cmp = (a.es_default === b.es_default) ? 0 : (a.es_default ? -1 : 1);
           break;
         case 'hora_inicio':
         case 'hora_fin':
@@ -156,7 +157,7 @@ export default function TariffList() {
                 <tr className="bg-gray-100 text-sm text-gray-600 uppercase">
                   {header('id', 'ID')}
                   {header('dia_semana', 'Día Semana')}
-                  {header('default', 'Por Defecto')}
+                  {header('es_default', 'Por Defecto')}
                   {header('hora_inicio', 'Hora Inicio')}
                   {header('hora_fin', 'Hora Fin')}
                   {header('tarifa', 'Tarifa')}
@@ -179,7 +180,7 @@ export default function TariffList() {
                       <tr key={t.id} className="border-b hover:bg-gray-50">
                         <td className="p-3 text-gray-800">{t.id}</td>
                         <td className="p-3 text-gray-800">{label}</td>
-                        <td className="p-3 text-gray-800">{t.default ? 'Sí' : 'No'}</td>
+                        <td className="p-3 text-gray-800">{t.es_default ? 'Sí' : 'No'}</td>
                         <td className="p-3 text-gray-800">{t.hora_inicio}</td>
                         <td className="p-3 text-gray-800">{t.hora_fin}</td>
                         <td className="p-3 text-gray-800">{t.tarifa.toFixed(2)}</td>
@@ -193,7 +194,7 @@ export default function TariffList() {
                           >
                             <FaEdit className="text-[#0B91C1]" size={16} />
                           </button>
-                          {!t.default && (
+                          {!t.es_default && (
                             <button
                               title="Marcar como tarifa por defecto"
                               onClick={() => makeDefault(t.id!)}
@@ -204,20 +205,20 @@ export default function TariffList() {
                           )}
                           <button
                             title={
-                              t.default
+                              t.es_default
                                 ? 'Esta es la tarifa por defecto. Cámbiala para poder eliminarla'
                                 : 'Eliminar Tarifa'
                             }
-                            onClick={() => !t.default && handleDelete(t.id!)}
-                            disabled={t.default}
+                            onClick={() => !t.es_default && handleDelete(t.id!)}
+                            disabled={t.es_default}
                             className={`
                               p-2 rounded-lg border transition
-                              ${t.default
+                              ${t.es_default
                                 ? 'border-gray-300 text-gray-400 cursor-not-allowed'
                                 : 'bg-white border-transparent hover:bg-red-50'}
                             `}
                           >
-                            <FaTrash className={t.default ? 'text-gray-400' : 'text-red-500'} size={16} />
+                            <FaTrash className={t.es_default ? 'text-gray-400' : 'text-red-500'} size={16} />
                           </button>
                         </td>
                       </tr>

@@ -19,7 +19,7 @@ import {
 
 interface Tarifa {
   tarifa: number;
-  default: boolean;
+  es_default: boolean;
 }
 
 interface Cancha {
@@ -86,7 +86,7 @@ const ReservaStep2: React.FC = () => {
       .catch(() => setError('No se pudo cargar la disponibilidad.'));
   }, [canchaId, date]);
 
-  const tarifa = cancha?.tarifas?.find(t => t.default);
+  const tarifa = cancha?.tarifas?.find(t => t.es_default);
 
   const toggleSeleccion = (bloque: string) => {
     setSeleccionados(prev =>
@@ -109,6 +109,9 @@ const ReservaStep2: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      const reservasCreadas = res.data; // Suponiendo que backend devuelve un array de reservas
+      const reservasIds = reservasCreadas.map((r: any) => r.id).join(',');
+
       localStorage.setItem('reservas_pendientes', JSON.stringify({
         cancha_id: canchaId,
         fecha: date,
@@ -116,8 +119,9 @@ const ReservaStep2: React.FC = () => {
         createdAt: new Date().toISOString()
       }));
 
-      alert('Reserva creada. Redirigir a pago...');
+      // alert('Reserva creada. Redirigir a pago...');
       // navigate('/pago');
+      navigate(`/reservar/${canchaId}/pago?ids=${reservasIds}&date=${date}`);
     } catch (err) {
       console.error(err);
       setError('No se pudo crear la reserva.');
@@ -125,6 +129,25 @@ const ReservaStep2: React.FC = () => {
   };
 
   const fechaBonita = date ? format(parseISO(date), "d 'de' MMMM 'de' yyyy", { locale: es }) : '';
+
+  // Calcular duración total de los bloques seleccionados
+  const totalMs = seleccionados.reduce((acc, bloque) => {
+    const [ini, fin] = bloque.split(' - ');
+    const hIni = new Date(`1970-01-01T${ini}:00`);
+    const hFin = new Date(`1970-01-01T${fin}:00`);
+    return acc + (hFin.getTime() - hIni.getTime());
+  }, 0);
+
+  const totalMin = Math.floor(totalMs / (1000 * 60));
+  const horas = Math.floor(totalMin / 60);
+  const minutos = totalMin % 60;
+
+  const duracion =
+    seleccionados.length === 0
+      ? 'Seleccionar'
+      : minutos === 0
+      ? `${horas} hora${horas !== 1 ? 's' : ''}`
+      : `${horas}h ${minutos}min`;
 
   return (
     <>
@@ -186,7 +209,7 @@ const ReservaStep2: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <Card icon={DollarSign} title={`$${tarifa?.tarifa ?? 'N/D'}`} subtitle="Costo del alquiler" />
-                <Card icon={Clock} title="1 hora" subtitle="Duración" />
+                <Card icon={Clock} title={duracion} subtitle="Duración" />
                 <Card icon={Calendar} title={fechaBonita} subtitle="Fecha" />
                 <Card icon={AlarmClock} title={seleccionados.join(', ') || 'Seleccionar'} subtitle="Horarios" />
                 <Card icon={MapPin} title={cancha.ubicacion} subtitle="Ubicación" />

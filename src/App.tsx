@@ -18,6 +18,7 @@ import ManageCourts       from './components/ManageCourts';
 import CourtForm          from './components/courts/CourtForm';
 import CompanyDashboard   from './components/CompanyDashboard';
 import UserDashboard      from './components/UserDashboard';
+import ManageUserCompanies from './components/ManageUserCompanies';
 
 import LandingPage        from './pages/LandingPage';
 import AboutAs            from './pages/AboutAs';
@@ -142,7 +143,7 @@ function App() {
         <Route
           path="/admin/empresa"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <CompanyForm />
             </ProtectedRoute>
           }
@@ -150,7 +151,7 @@ function App() {
         <Route
           path="/admin/empresa/:id"
           element={
-            <ProtectedRoute allowedRoles={[1]}>
+            <ProtectedRoute allowedRoles={[1, 3]}>
               <CompanyForm />
             </ProtectedRoute>
           }
@@ -263,7 +264,7 @@ function App() {
           path="/company/empresas"
           element={
             <ProtectedRoute allowedRoles={[3]}>
-              <CompanyCourtsList />
+              <ManageUserCompanies />
             </ProtectedRoute>
           }
         />

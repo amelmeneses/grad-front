@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from './Navbar';
 import AdminNav from './AdminNav';
@@ -20,6 +21,13 @@ interface User {
   rol_id: number;
 }
 
+interface TokenPayload {
+  id: number;
+  role: number;
+  name: string;
+  exp: number;
+}
+
 interface CompanyFormProps {
   onCompanyAdded?: () => void;
 }
@@ -29,6 +37,7 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
+  const [role, setRole] = useState<number | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [form, setForm] = useState<EmpresaData>({
     nombre: '',
@@ -42,6 +51,8 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const decoded = jwtDecode<TokenPayload>(token);
+    setRole(decoded.role);
     axios.get<User[]>('/api/users', {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -122,7 +133,7 @@ export default function CompanyForm({ onCompanyAdded }: CompanyFormProps) {
       }
 
       if (onCompanyAdded) onCompanyAdded();
-      navigate('/admin/empresas');
+      navigate(role === 3 ? '/company/empresas' : '/admin/empresas');
     } catch {
       setError('Error al guardar la empresa. Intenta nuevamente.');
     }

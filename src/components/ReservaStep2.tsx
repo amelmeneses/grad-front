@@ -1,5 +1,4 @@
 // src/components/ReservaStep2.tsx
-
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -32,10 +31,40 @@ interface Cancha {
   tarifas?: Tarifa[];
 }
 
+interface Horario {
+  hora_inicio: string;
+  hora_fin: string;
+}
+
+const agruparBloquesContinuos = (bloques: string[]): Horario[] => {
+  const parseHora = (h: string) => new Date(`1970-01-01T${h}:00`);
+  const horarios = bloques.map(b => {
+    const [inicio, fin] = b.split(' - ');
+    return { hora_inicio: inicio, hora_fin: fin };
+  }).sort((a, b) => parseHora(a.hora_inicio).getTime() - parseHora(b.hora_inicio).getTime());
+
+  const grupos: Horario[] = [];
+  let actual = horarios[0];
+
+  for (let i = 1; i < horarios.length; i++) {
+    const anteriorFin = parseHora(actual.hora_fin).getTime();
+    const actualInicio = parseHora(horarios[i].hora_inicio).getTime();
+
+    if (actualInicio === anteriorFin) {
+      actual.hora_fin = horarios[i].hora_fin;
+    } else {
+      grupos.push(actual);
+      actual = horarios[i];
+    }
+  }
+  grupos.push(actual);
+  return grupos;
+};
+
 const ReservaStep2: React.FC = () => {
   const { canchaId, date } = useParams<{ canchaId: string; date: string }>();
   const [cancha, setCancha] = useState<Cancha | null>(null);
-  const [horarios, setHorarios] = useState<{ hora_inicio: string; hora_fin: string }[]>([]);
+  const [horarios, setHorarios] = useState<Horario[]>([]);
   const [seleccionados, setSeleccionados] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -61,15 +90,38 @@ const ReservaStep2: React.FC = () => {
 
   const toggleSeleccion = (bloque: string) => {
     setSeleccionados(prev =>
-      prev.includes(bloque)
-        ? prev.filter(b => b !== bloque)
-        : [...prev, bloque]
+      prev.includes(bloque) ? prev.filter(b => b !== bloque) : [...prev, bloque]
     );
   };
 
-  const handleReserva = () => {
-    console.log('Reservando bloques:', seleccionados);
-    alert('Reemplazar alert por reserva process');
+  const handleReserva = async () => {
+    if (!date || !canchaId) return;
+    const bloques = agruparBloquesContinuos(seleccionados);
+    const token = localStorage.getItem('token');
+
+    try {
+      const res = await axios.post('/api/reservas', {
+        cancha_id: canchaId,
+        fecha: date,
+        bloques,
+        estado: 'pending'
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      localStorage.setItem('reservas_pendientes', JSON.stringify({
+        cancha_id: canchaId,
+        fecha: date,
+        bloques,
+        createdAt: new Date().toISOString()
+      }));
+
+      alert('Reserva creada. Redirigir a pago...');
+      // navigate('/pago');
+    } catch (err) {
+      console.error(err);
+      setError('No se pudo crear la reserva.');
+    }
   };
 
   const fechaBonita = date ? format(parseISO(date), "d 'de' MMMM 'de' yyyy", { locale: es }) : '';
@@ -103,9 +155,7 @@ const ReservaStep2: React.FC = () => {
                     key={i}
                     onClick={() => toggleSeleccion(bloque)}
                     className={`py-4 px-2 rounded-2xl text-sm font-semibold border shadow text-center leading-tight transition-colors duration-150 ${
-                      isActive
-                        ? 'bg-[#f89e1b] text-black'
-                        : 'bg-green-100 text-green-800'
+                      isActive ? 'bg-[#f89e1b] text-black' : 'bg-green-100 text-green-800'
                     }`}
                   >
                     <div>{h.hora_inicio}</div>

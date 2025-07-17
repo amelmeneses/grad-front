@@ -1,8 +1,14 @@
+// src/components/Navbar.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-import { FaSignOutAlt } from 'react-icons/fa';
+import {
+  FaSignOutAlt,
+  FaUserCircle,
+  FaChevronDown,
+} from 'react-icons/fa';
 import logo from '../assets/logo_menu.svg';
+import BackButton from './BackButton';
 
 const links = [
   { to: '/',         label: 'Home' },
@@ -28,6 +34,11 @@ const Navbar: React.FC = () => {
   const [roleId, setRoleId] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Ruta inicial de la sesión
+  const initialPath = sessionStorage.getItem('initialPath') || '';
+  const isAtInitial = pathname === initialPath;
+
+  // Cargo usuario desde el token
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -42,9 +53,13 @@ const Navbar: React.FC = () => {
     }
   }, []);
 
+  // Cerrar dropdown al hacer click fuera
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -60,8 +75,26 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 w-full bg-white shadow-sm z-50">
+    <nav className="relative sticky top-0 left-0 w-full bg-white shadow-sm z-50">
       <div className="max-w-screen-xl mx-auto px-6 py-4 flex items-center justify-between">
+        {/* Flecha de volver (solo si hay usuario y no estamos en la ruta inicial) */}
+        {userName && !isAtInitial && (
+          <BackButton
+            label="Volver"
+            disabled={isAtInitial}
+            className="
+              absolute
+              left-[20px]
+              top-[95px]
+              bg-transparent
+              text-black
+              hover:bg-gray-100
+              z-50
+            "
+          />
+        )}
+
+        {/* Logo */}
         <Link to="/" className="flex-shrink-0">
           <img src={logo} alt="PlayBooker Logo" className="h-12 w-auto" />
         </Link>
@@ -87,10 +120,18 @@ const Navbar: React.FC = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="py-2 px-6 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
-                             text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
+                  className="
+                    py-2 px-6
+                    bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                    text-white font-medium rounded-full shadow-xl
+                    hover:opacity-90 transition-opacity duration-200
+                  "
                 >
-                  {userName}
+                  <div className="flex items-center">
+                    <FaUserCircle className="w-5 h-5 mr-2" />
+                    <span>{userName}</span>
+                    <FaChevronDown className="w-4 h-4 ml-2" />
+                  </div>
                 </button>
                 {dropdownOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg divide-y divide-gray-200 z-50">
@@ -121,8 +162,12 @@ const Navbar: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Link
                   to={roleId === 1 ? '/dashboard-admin' : '/dashboard-company'}
-                  className="py-2 px-6 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
-                             text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
+                  className="
+                    py-2 px-6
+                    bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                    text-white font-medium rounded-full shadow-xl
+                    hover:opacity-90 transition-opacity duration-200
+                  "
                 >
                   {userName}
                 </Link>
@@ -138,8 +183,12 @@ const Navbar: React.FC = () => {
           ) : (
             <Link
               to="/login"
-              className="ml-4 py-2 px-8 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
-                         text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
+              className="
+                ml-4 py-2 px-8
+                bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                text-white font-medium rounded-full shadow-xl
+                hover:opacity-90 transition-opacity duration-200
+              "
             >
               Iniciar
             </Link>
@@ -189,16 +238,28 @@ const Navbar: React.FC = () => {
                   '/dashboard-company'
                 }
                 onClick={() => setMenuOpen(false)}
-                className="block w-full text-center py-3 px-12 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
-                           text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
+                className="
+                  block w-full text-center py-3 px-12
+                  bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                  text-white font-medium rounded-full shadow-xl
+                  hover:opacity-90 transition-opacity duration-200
+                "
               >
-                {userName}
+                <div className="flex items-center justify-center">
+                  <FaUserCircle className="w-5 h-5 mr-2" />
+                  <span>{userName}</span>
+                  <FaChevronDown className="w-4 h-4 ml-2" />
+                </div>
               </Link>
               {roleId === 2 && (
                 <Link
                   to="/mis-reservas"
                   onClick={() => setMenuOpen(false)}
-                  className="block w-full text-center py-3 px-12 bg-gray-100 text-gray-800 font-medium rounded-full hover:bg-gray-200 transition"
+                  className="
+                    block w-full text-center py-3 px-12
+                    bg-gray-100 text-gray-800 font-medium rounded-full
+                    hover:bg-gray-200 transition
+                  "
                 >
                   Mis reservas
                 </Link>
@@ -218,8 +279,12 @@ const Navbar: React.FC = () => {
             <Link
               to="/login"
               onClick={() => setMenuOpen(false)}
-              className="mt-4 py-3 px-12 bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
-                         text-white font-medium rounded-full shadow-xl hover:opacity-90 transition-opacity duration-200"
+              className="
+                mt-4 py-3 px-12
+                bg-gradient-to-r from-[#0B91C1] to-[#EB752B]
+                text-white font-medium rounded-full shadow-xl
+                hover:opacity-90 transition-opacity duration-200
+              "
             >
               Iniciar
             </Link>

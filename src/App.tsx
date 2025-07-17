@@ -41,8 +41,15 @@ import ReservaStep1 from './components/ReservaStep1';
 import ReservaStep2 from './components/ReservaStep2';
 import ReservaStep3 from './components/ReservaStep3';
 import ReservasList from './components/ReservasList';
+import { useEffect } from 'react';
 
 function App() {
+    // 1) Guardamos la ruta inicial de la sesión
+  useEffect(() => {
+    if (!sessionStorage.getItem('initialPath')) {
+      sessionStorage.setItem('initialPath', window.location.pathname);
+    }
+  }, []);
   return (
     <Router>
       <Routes>

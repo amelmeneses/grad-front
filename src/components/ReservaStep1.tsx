@@ -56,8 +56,7 @@ const ReservaStep1: React.FC = () => {
     <>
       <Navbar />
       <div className="min-h-screen pt-32 px-6 md:px-16">
-        <h1 className="text-3xl font-bold text-center mb-10">PROGRAME SU RESERVA</h1>
-
+        <h1 className="text-3xl font-bold text-center text-gray-900 mb-10">PROGRAME SU RESERVA</h1>
         {error && <p className="text-center text-red-600">{error}</p>}
 
         {cancha && (

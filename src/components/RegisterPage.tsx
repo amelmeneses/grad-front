@@ -38,7 +38,6 @@ const RegisterPage: React.FC = () => {
     }
 
     if (isCompany) {
-      // all empresa fields required
       for (let key of ['nombre','contacto_email','contacto_telefono','direccion'] as const) {
         if (!empresa[key]) {
           setError('Todos los datos de empresa son obligatorios');
@@ -53,12 +52,11 @@ const RegisterPage: React.FC = () => {
         apellido,
         email,
         password,
-        rol_id: isCompany ? 3 : undefined  // backend default 3 anyway
+        rol_id: isCompany ? 3 : undefined
       };
       if (isCompany) payload.empresa = empresa;
 
       const { data } = await axios.post('/api/register-anon-user', payload);
-      // redirect to /login carrying the success message
       navigate('/login', { state: { info: data.message } });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Error al registrarse');
@@ -69,26 +67,26 @@ const RegisterPage: React.FC = () => {
     <>
       <Navbar />
 
-      <div className="min-h-screen w-screen bg-gray-50 flex items-center justify-center">
-        <div className="flex flex-col md:flex-row items-center w-full">
-          {/* ————— Tarjeta del formulario ————— */}
-          <div className="w-full md:w-1/2 max-w-md mx-auto md:mx-0 
-                          bg-white bg-opacity-60 backdrop-blur-md p-8 
-                          rounded-3xl shadow-xl">
-            <h2 className="text-3xl font-semibold text-gray-800 mb-2 text-center">
+      <div className="min-h-screen w-screen bg-gray-50 flex items-center justify-center px-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-center w-full max-w-5xl">
+          {/* — Tarjeta del formulario — */}
+          <div className="w-full md:w-1/2 max-w-md mx-auto 
+                          bg-white bg-opacity-60 backdrop-blur-md p-6 
+                          rounded-3xl shadow-xl text-sm space-y-4">
+            <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 mb-1 text-center">
               Crea tu cuenta
             </h2>
-            <p className="text-sm text-gray-600 mb-6 text-center">
+            <p className="text-xs md:text-sm text-gray-600 mb-4 text-center">
               Completa los datos para registrarte.
             </p>
             {error && (
-              <p className="text-red-500 text-center mb-4">{error}</p>
+              <p className="text-red-500 text-center mb-2">{error}</p>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Nombre */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Nombres
                 </label>
                 <input
@@ -97,15 +95,15 @@ const RegisterPage: React.FC = () => {
                   onChange={e => setNombre(e.target.value)}
                   placeholder="Ingresa tus nombres"
                   required
-                  className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                  className="w-full p-2 bg-white bg-opacity-90 border border-gray-200 
                              rounded-xl shadow-inner text-gray-800
                              focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
                 />
               </div>
 
-              {/* Apellido */}
+              {/* Apellidos */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Apellidos
                 </label>
                 <input
@@ -114,7 +112,7 @@ const RegisterPage: React.FC = () => {
                   onChange={e => setApellido(e.target.value)}
                   placeholder="Ingresa tus apellidos"
                   required
-                  className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                  className="w-full p-2 bg-white bg-opacity-90 border border-gray-200 
                              rounded-xl shadow-inner text-gray-800
                              focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
                 />
@@ -122,7 +120,7 @@ const RegisterPage: React.FC = () => {
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Correo electrónico
                 </label>
                 <input
@@ -131,7 +129,7 @@ const RegisterPage: React.FC = () => {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="Ingresa tu email"
                   required
-                  className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                  className="w-full p-2 bg-white bg-opacity-90 border border-gray-200 
                              rounded-xl shadow-inner text-gray-800
                              focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
                 />
@@ -139,7 +137,7 @@ const RegisterPage: React.FC = () => {
 
               {/* Contraseña */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Contraseña
                 </label>
                 <input
@@ -148,7 +146,7 @@ const RegisterPage: React.FC = () => {
                   onChange={e => setPassword(e.target.value)}
                   placeholder="Ingresa tu contraseña"
                   required
-                  className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                  className="w-full p-2 bg-white bg-opacity-90 border border-gray-200 
                              rounded-xl shadow-inner text-gray-800
                              focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
                 />
@@ -156,7 +154,7 @@ const RegisterPage: React.FC = () => {
 
               {/* Confirmar Contraseña */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Confirmar Contraseña
                 </label>
                 <input
@@ -165,7 +163,7 @@ const RegisterPage: React.FC = () => {
                   onChange={e => setConfirmPwd(e.target.value)}
                   placeholder="Repite tu contraseña"
                   required
-                  className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                  className="w-full p-2 bg-white bg-opacity-90 border border-gray-200 
                              rounded-xl shadow-inner text-gray-800
                              focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
                 />
@@ -176,46 +174,42 @@ const RegisterPage: React.FC = () => {
                 className={`rounded-lg p-1 bg-gradient-to-r from-[#0B91C1] to-[#EB752B] transition 
                             ${isCompany ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
               >
-                <div className="flex items-start bg-white rounded-lg p-4 space-x-3">
+                <div className="flex items-start bg-white rounded-lg p-3 space-x-2">
                   <input
                     type="checkbox"
                     checked={isCompany}
                     onChange={() => setIsCompany(v => !v)}
-                    className="h-6 w-6 cursor-pointer text-[#0B91C1] border-gray-300 rounded focus:ring-[#0B91C1]"
+                    className="h-5 w-5 cursor-pointer text-[#0B91C1] border-gray-300 rounded focus:ring-[#0B91C1]"
                   />
                   <div className="cursor-pointer" onClick={() => setIsCompany(v => !v)}>
                     <label className="text-sm font-medium text-gray-700 select-none">
                       Registrarse como empresa
                     </label>
                     <p className="mt-1 text-xs text-gray-600">
-                      Marca este campo si quieres registrarte como empresa para empezar a manejar tus reservas con Playbooker.
+                      Marca este campo si quieres registrarte como empresa para manejar tus reservas.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Campos de Empresa (si toca) */}
+              {/* Campos de Empresa */}
               {isCompany && (
-                <div className="space-y-4 border-t border-gray-200 pt-4">
-                  {(
-                    [
-                      { name: 'nombre',     label: 'Nombre de la empresa',   type: 'text' },
-                      { name: 'contacto_email',     label: 'Email de contacto',     type: 'email' },
-                      { name: 'contacto_telefono',  label: 'Teléfono de contacto',   type: 'text' },
-                      { name: 'direccion',  label: 'Dirección',              type: 'text' }
-                    ] as const
-                  ).map(field => (
-                    <div key={field.name}>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        {field.label}
+                <div className="space-y-3 border-t border-gray-200 pt-3">
+                  {(['nombre','contacto_email','contacto_telefono','direccion'] as const).map(key => (
+                    <div key={key}>
+                      <label className="block text-xs font-medium text-gray-700 mb-1">
+                        {key === 'contacto_telefono' ? 'Teléfono de contacto' :
+                         key === 'contacto_email'   ? 'Email de contacto' :
+                         key === 'direccion'        ? 'Dirección' :
+                                                     'Nombre de la empresa'}
                       </label>
                       <input
-                        name={field.name}
-                        type={field.type}
-                        value={(empresa as any)[field.name]}
+                        name={key}
+                        type={key === 'contacto_email' ? 'email' : 'text'}
+                        value={(empresa as any)[key]}
                         onChange={handleEmpresaChange}
                         required
-                        className="w-full p-3 bg-white bg-opacity-90 border border-gray-200 
+                        className="w-full p-2 bg-white bg-opacity-90 border border-gray-200 
                                    rounded-xl shadow-inner text-gray-800
                                    focus:outline-none focus:ring-2 focus:ring-[#0B91C1] transition"
                       />
@@ -227,7 +221,7 @@ const RegisterPage: React.FC = () => {
               {/* Botón gradient */}
               <button
                 type="submit"
-                className="w-full py-3 font-medium text-white rounded-xl 
+                className="w-full py-2 font-medium text-white rounded-xl 
                            bg-gradient-to-r from-[#0B91C1] to-[#EB752B] 
                            shadow-lg hover:opacity-90 transition"
               >
@@ -235,7 +229,7 @@ const RegisterPage: React.FC = () => {
               </button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-gray-600">
+            <p className="mt-4 text-center text-xs text-gray-600">
               ¿Ya tienes una cuenta?{' '}
               <a href="/login" className="text-[#0B91C1] font-medium hover:underline">
                 Inicia sesión
@@ -243,12 +237,12 @@ const RegisterPage: React.FC = () => {
             </p>
           </div>
 
-          {/* ————— Ilustración ————— */}
-          <div className="hidden md:flex md:w-1/2 justify-center items-center">
+          {/* — Ilustración — */}
+          <div className="hidden md:flex md:w-1/2 justify-end items-end">
             <img
               src={singInImage}
               alt="Ilustración deportiva"
-              className="max-w-full h-auto object-contain"
+              className="w-auto max-h-screen object-contain"
             />
           </div>
         </div>

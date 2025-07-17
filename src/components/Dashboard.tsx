@@ -1,8 +1,6 @@
 // src/components/Dashboard.tsx
 
 import { useState } from 'react';
-import UserForm        from '../components/users/UserForm';
-import UserList        from '../components/users/UserList';
 import CompanyForm     from '../components/CompanyForm';
 import CompanyList     from '../components/companies/CompanyList';
 import ManageCourts    from '../components/ManageCourts';    // ← Import corregido
@@ -18,8 +16,6 @@ const Dashboard = () => {
       <h1>Admin Dashboard</h1>
 
       <h2>Users</h2>
-      <UserForm onUserAdded={reload} />
-      <UserList key={`users-${refresh}`} />
 
       <h2>Companies</h2>
       <CompanyForm onCompanyAdded={reload} />

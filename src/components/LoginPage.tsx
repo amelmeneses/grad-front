@@ -118,7 +118,7 @@ const LoginPage: React.FC = () => {
                     <span className="ml-2">Recordar por 30 días</span>
                   </label>
                   <a href="#" className="text-[#0B91C1] hover:underline">
-                    Olvidar contraseña?
+                    Olvidó su contraseña?
                   </a>
                 </div>
 

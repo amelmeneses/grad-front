@@ -38,10 +38,16 @@ interface Horario {
 
 const agruparBloquesContinuos = (bloques: string[]): Horario[] => {
   const parseHora = (h: string) => new Date(`1970-01-01T${h}:00`);
-  const horarios = bloques.map(b => {
-    const [inicio, fin] = b.split(' - ');
-    return { hora_inicio: inicio, hora_fin: fin };
-  }).sort((a, b) => parseHora(a.hora_inicio).getTime() - parseHora(b.hora_inicio).getTime());
+  const horarios = bloques
+    .map(b => {
+      const [inicio, fin] = b.split(' - ');
+      return { hora_inicio: inicio, hora_fin: fin };
+    })
+    .sort(
+      (a, b) =>
+        parseHora(a.hora_inicio).getTime() -
+        parseHora(b.hora_inicio).getTime()
+    );
 
   const grupos: Horario[] = [];
   let actual = horarios[0];
@@ -76,13 +82,19 @@ const ReservaStep2: React.FC = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => setCancha(res.data))
-      .catch(() => setError('No se pudo cargar la información de la cancha.'));
+      .catch(() =>
+        setError('No se pudo cargar la información de la cancha.')
+      );
 
     axios
       .get(`/api/canchas/${canchaId}/disponibilidad/${date}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setHorarios(Array.isArray(res.data.horarios) ? res.data.horarios : []))
+      .then(res =>
+        setHorarios(
+          Array.isArray(res.data.horarios) ? res.data.horarios : []
+        )
+      )
       .catch(() => setError('No se pudo cargar la disponibilidad.'));
   }, [canchaId, date]);
 
@@ -90,7 +102,9 @@ const ReservaStep2: React.FC = () => {
 
   const toggleSeleccion = (bloque: string) => {
     setSeleccionados(prev =>
-      prev.includes(bloque) ? prev.filter(b => b !== bloque) : [...prev, bloque]
+      prev.includes(bloque)
+        ? prev.filter(b => b !== bloque)
+        : [...prev, bloque]
     );
   };
 
@@ -100,35 +114,48 @@ const ReservaStep2: React.FC = () => {
     const token = localStorage.getItem('token');
 
     try {
-      const res = await axios.post('/api/reservas', {
-        cancha_id: canchaId,
-        fecha: date,
-        bloques,
-        estado: 'pending'
-      }, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axios.post(
+        '/api/reservas',
+        {
+          cancha_id: canchaId,
+          fecha: date,
+          bloques,
+          estado: 'pending',
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
-      const reservasCreadas = res.data; // Suponiendo que backend devuelve un array de reservas
-      const reservasIds = reservasCreadas.map((r: any) => r.id).join(',');
+      const reservasCreadas = res.data;
+      const reservasIds = reservasCreadas
+        .map((r: any) => r.id)
+        .join(',');
 
-      localStorage.setItem('reservas_pendientes', JSON.stringify({
-        cancha_id: canchaId,
-        fecha: date,
-        bloques,
-        createdAt: new Date().toISOString()
-      }));
+      localStorage.setItem(
+        'reservas_pendientes',
+        JSON.stringify({
+          cancha_id: canchaId,
+          fecha: date,
+          bloques,
+          createdAt: new Date().toISOString(),
+        })
+      );
 
-      // alert('Reserva creada. Redirigir a pago...');
-      // navigate('/pago');
-      navigate(`/reservar/${canchaId}/pago?ids=${reservasIds}&date=${date}`);
+      navigate(
+        `/reservar/${canchaId}/pago?ids=${reservasIds}&date=${date}`
+      );
     } catch (err) {
       console.error(err);
       setError('No se pudo crear la reserva.');
     }
   };
 
-  const fechaBonita = date ? format(parseISO(date), "d 'de' MMMM 'de' yyyy", { locale: es }) : '';
+  const fechaBonita = date
+    ? format(parseISO(date), "d 'de' MMMM 'de' yyyy", {
+        locale: es,
+      })
+    : '';
 
   // Calcular duración total de los bloques seleccionados
   const totalMs = seleccionados.reduce((acc, bloque) => {
@@ -182,7 +209,9 @@ const ReservaStep2: React.FC = () => {
                     key={i}
                     onClick={() => toggleSeleccion(bloque)}
                     className={`py-4 px-2 rounded-2xl text-sm font-semibold border shadow text-center leading-tight transition-colors duration-150 ${
-                      isActive ? 'bg-[#f89e1b] text-black' : 'bg-green-100 text-green-800'
+                      isActive
+                        ? 'bg-[#f89e1b] text-black'
+                        : 'bg-green-100 text-green-800'
                     }`}
                   >
                     <div>{h.hora_inicio}</div>
@@ -199,7 +228,7 @@ const ReservaStep2: React.FC = () => {
                   onClick={handleReserva}
                   className="bg-gradient-to-r from-[#1D9DB6] to-[#EB752B] hover:from-[#138a99] hover:to-[#d95c16] text-white font-semibold py-2 px-6 rounded-full w-full shadow text-center transition duration-300"
                 >
-                  Reservar por ${totalPagar}
+                  Reservar por ${totalPagar} — {duracion}
                 </button>
               </div>
             )}
@@ -208,17 +237,25 @@ const ReservaStep2: React.FC = () => {
           {/* Derecha */}
           {cancha && (
             <div className="bg-white p-6 rounded-xl shadow-xl">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{cancha.nombre}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {cancha.nombre}
+              </h2>
               <p className="text-gray-500 mb-6">{cancha.descripcion}</p>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <Card
                   icon={DollarSign}
                   title={`$${totalPagar}`}
-                  subtitle={`Tarifa: $${tarifaValor.toFixed(2)} por hora`}
+                  subtitle={`Tarifa: $${tarifaValor.toFixed(
+                    2
+                  )} por hora`}
                 />
                 <Card icon={Clock} title={duracion} subtitle="Duración" />
-                <Card icon={Calendar} title={fechaBonita} subtitle="Fecha" />
+                <Card
+                  icon={Calendar}
+                  title={fechaBonita}
+                  subtitle="Fecha"
+                />
                 <Card
                   icon={AlarmClock}
                   title={
@@ -234,11 +271,31 @@ const ReservaStep2: React.FC = () => {
                   }
                   subtitle="Horarios"
                 />
-                <Card icon={MapPin} title={cancha.ubicacion} subtitle="Ubicación" />
+                <Card
+                  icon={MapPin}
+                  title={cancha.ubicacion}
+                  subtitle="Ubicación"
+                />
                 <Card icon={Globe} title="Ecuador" subtitle="Zona horaria" />
+
+                {/* Servicios y botón duplicado */}
                 <div className="col-span-2 flex justify-center">
                   <div className="w-full md:w-2/3">
-                    <Card icon={Info} title="Servicios" subtitle="Chalecos, pelota." />
+                    <Card
+                      icon={Info}
+                      title="Servicios"
+                      subtitle="Chalecos, pelota."
+                    />
+                    {seleccionados.length > 0 && (
+                      <div className="mt-6 text-center">
+                        <button
+                          onClick={handleReserva}
+                          className="bg-gradient-to-r from-[#1D9DB6] to-[#EB752B] hover:from-[#138a99] hover:to-[#d95c16] text-white font-semibold py-2 px-6 rounded-full w-full shadow text-center transition duration-300"
+                        >
+                          Reservar por ${totalPagar} — {duracion}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

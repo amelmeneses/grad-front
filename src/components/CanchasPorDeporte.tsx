@@ -33,7 +33,7 @@ const CanchasPorDeporte: React.FC = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
-
+    console.log('User:', user);
     if (!token || user.rol_id !== 2) {
       navigate('/login', {
         state: {

@@ -28,7 +28,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
     descripcion: '',
     ubicacion: '',
     deporte: '',
-    estado: 1,              // <— inicial activo
+    estado: 0,              // <— inicial activo
     imagen_principal: '',
     empresa_id: Number(empresaId),
   });

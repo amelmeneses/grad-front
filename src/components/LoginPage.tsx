@@ -71,7 +71,7 @@ const LoginPage: React.FC = () => {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="Ingresa tu email"
                     required
-                    className="w-full p-3 border border-gray-200 rounded-xl shadow-inner focus:outline-none focus:ring-2 focus:ring-[#0B91C1]"
+                    className="w-full p-3 border border-gray-200 rounded-xl shadow-inner text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0B91C1]"
                   />
                 </div>
 

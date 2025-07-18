@@ -1,9 +1,17 @@
+// src/components/CourtForm.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate }        from 'react-router-dom';
 import axios                              from 'axios';
 import AdminNav                           from '../AdminNav';
 import { Court }                         from '../../interfaces/Court';
 import Navbar from '../Navbar';
+import { jwtDecode }                      from 'jwt-decode';
+
+interface TokenPayload {
+  id: number;
+  role: number;
+  exp: number;
+}
 
 interface CourtFormProps {
   onCourtAdded?: () => void;
@@ -14,6 +22,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
+  const [roleId, setRoleId] = useState<number | null>(null);
   const [form, setForm] = useState<Omit<Court, 'id'>>({
     nombre: '',
     descripcion: '',
@@ -27,6 +36,19 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
   const [error, setError] = useState<string | null>(null);
   const [imagenPreview, setImagenPreview] = useState<string | null>(null);
   const [mostrarInputImagen, setMostrarInputImagen] = useState(false);
+
+  // Obtener rol desde token
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const { role } = jwtDecode<TokenPayload>(token);
+        setRoleId(role);
+      } catch {
+        setRoleId(null);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!isEdit) {
@@ -44,7 +66,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
           descripcion: res.data.descripcion!,
           ubicacion:   res.data.ubicacion!,
           deporte:     res.data.deporte,
-          estado:      res.data.estado,     // <— recuperamos estado
+          estado:      res.data.estado,
           imagen_principal:  res.data.imagen_principal,
           empresa_id:  res.data.empresa_id
         });
@@ -62,9 +84,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
       ...prev,
       [name]: type === 'checkbox'
         ? Number((e.target as HTMLInputElement).checked)
-        : name === 'estado'
-          ? Number(value)
-          : value,
+        : value,
     }));
   };
 
@@ -113,7 +133,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
     <>
       {/* Navbar superior fijo */}
       <Navbar />
-  
+
       {/* Layout principal con margen por el navbar */}
       <div className="flex min-h-screen bg-white mt-19">
         {/* Sidebar de administración */}
@@ -125,7 +145,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
             {isEdit ? 'Editar Cancha' : 'Crear Cancha'}
           </h1>
           {error && <p className="mb-4 text-red-500">{error}</p>}
-  
+
           <form onSubmit={handleSubmit} className="space-y-5 bg-white p-6 rounded-2xl shadow-lg">
             {/* Nombre */}
             <div>
@@ -138,7 +158,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
-  
+
             {/* Descripción */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Descripción</label>
@@ -149,7 +169,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
-  
+
             {/* Ubicación */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Ubicación y referencia</label>
@@ -160,7 +180,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
                 className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900"
               />
             </div>
-  
+
             {/* Deporte */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">Deporte</label>
@@ -178,28 +198,30 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
                 <option value="padel">Pádel</option>
               </select>
             </div>
-  
-            {/* Estado */}
-            <div className="flex items-center space-x-2">
-              <input
-                id="estado"
-                name="estado"
-                type="checkbox"
-                checked={form.estado === 1}
-                onChange={handleChange}
-                className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded"
-              />
-              <label htmlFor="estado" className="text-gray-700 font-medium">
-                Activa
-              </label>
-            </div>
-  
+
+            {/* Estado (solo para admin rol=1) */}
+            {roleId === 1 && (
+              <div className="flex items-center space-x-2">
+                <input
+                  id="estado"
+                  name="estado"
+                  type="checkbox"
+                  checked={form.estado === 1}
+                  onChange={handleChange}
+                  className="h-4 w-4 text-[#0B91C1] border-gray-300 rounded"
+                />
+                <label htmlFor="estado" className="text-gray-700 font-medium">
+                  Activa
+                </label>
+              </div>
+            )}
+
             {/* Imagen principal */}
             <div>
               <label className="block mb-1 text-sm font-semibold text-gray-900">
                 Imagen principal <span className="text-red-500">*</span>
               </label>
-  
+
               {imagenPreview && !mostrarInputImagen ? (
                 <div className="mt-3 space-y-2">
                   <p className="text-sm text-gray-500 mb-1">Vista previa:</p>
@@ -230,7 +252,7 @@ const CourtForm: React.FC<CourtFormProps> = ({ }) => {
                 />
               )}
             </div>
-  
+
             <button
               type="submit"
               className="w-full py-3 text-white font-medium rounded-lg bg-gradient-to-r from-[#0B91C1] to-[#EB752B] hover:opacity-90 transition"

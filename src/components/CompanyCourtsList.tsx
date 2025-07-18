@@ -1,3 +1,5 @@
+// src/components/CompanyCourtsList.tsx
+
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
@@ -28,7 +30,7 @@ interface Option {
 
 export default function CompanyCourtsList() {
   const navigate = useNavigate();
-  // const [userId, setUserId] = useState<number | null>(null);
+  const [roleId, setRoleId] = useState<number | null>(null);
   const [empresas, setEmpresas] = useState<Empresa[]>([]);
   const [selectedEmpresa, setSelectedEmpresa] = useState<Option | null>(null);
   const [courts, setCourts] = useState<Court[]>([]);
@@ -38,24 +40,24 @@ export default function CompanyCourtsList() {
   const [sortCol, setSortCol] = useState<keyof Court>('deporte');
   const [asc, setAsc] = useState(true);
 
+  // decode user role
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      const { role } = jwtDecode<TokenPayload>(token);
+      setRoleId(role);
+    } catch {
+      setRoleId(null);
+    }
+  }, []);
+
   const customStyles: StylesConfig<Option, false> = {
-    control: (provided) => ({
-      ...provided,
-      backgroundColor: '#F9FAFB',
-      borderColor: '#E5E7EB',
-      padding: '2px',
-    }),
-    singleValue: (provided) => ({
-      ...provided,
-      color: '#1F2937',
-    }),
-    menu: (provided) => ({
-      ...provided,
-      backgroundColor: 'white',
-      zIndex: 999,
-    }),
-    option: (provided, state) => ({
-      ...provided,
+    control: (prov) => ({ ...prov, backgroundColor: '#F9FAFB', borderColor: '#E5E7EB', padding: '2px' }),
+    singleValue: (prov) => ({ ...prov, color: '#1F2937' }),
+    menu: (prov) => ({ ...prov, backgroundColor: 'white', zIndex: 999 }),
+    option: (prov, state) => ({
+      ...prov,
       backgroundColor: state.isFocused ? '#EFF6FF' : 'white',
       color: '#1F2937',
     }),
@@ -64,22 +66,20 @@ export default function CompanyCourtsList() {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) return;
-
     try {
       const { id } = jwtDecode<TokenPayload>(token);
-      // setUserId(id);
-
-      axios.get<Empresa[]>(`/api/empresas?usuario_id=${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(res => {
-        setEmpresas(res.data);
-        if (res.data.length > 0) {
-          setSelectedEmpresa({ value: res.data[0].id, label: res.data[0].nombre });
-        }
-      })
-      .catch(() => setError('No se pudieron cargar las empresas del usuario'));
-    } catch (e) {
+      axios
+        .get<Empresa[]>(`/api/empresas?usuario_id=${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then(res => {
+          setEmpresas(res.data);
+          if (res.data.length > 0) {
+            setSelectedEmpresa({ value: res.data[0].id, label: res.data[0].nombre });
+          }
+        })
+        .catch(() => setError('No se pudieron cargar las empresas del usuario'));
+    } catch {
       setError('Token inválido. Por favor inicia sesión nuevamente.');
     }
   }, []);
@@ -89,12 +89,13 @@ export default function CompanyCourtsList() {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem('token')!;
-    axios.get<Court[]>(`/api/canchas?empresa_id=${selectedEmpresa.value}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then(res => setCourts(res.data))
-    .catch(() => setError('No se pudieron cargar las canchas'))
-    .finally(() => setLoading(false));
+    axios
+      .get<Court[]>(`/api/canchas?empresa_id=${selectedEmpresa.value}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(res => setCourts(res.data))
+      .catch(() => setError('No se pudieron cargar las canchas'))
+      .finally(() => setLoading(false));
   }, [selectedEmpresa]);
 
   useEffect(() => {
@@ -104,13 +105,15 @@ export default function CompanyCourtsList() {
   useEffect(() => {
     const token = localStorage.getItem('token')!;
     const m: Record<number, number> = {};
-    Promise.all(courts.map(async c => {
-      const res = await axios.get<Tariff[]>(`/api/canchas/${c.id}/tarifas`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      const def = res.data.find(x => x.es_default);
-      if (def) m[c.id!] = Number(def.tarifa);
-    })).then(() => setPrices(m));
+    Promise.all(
+      courts.map(async c => {
+        const res = await axios.get<Tariff[]>(`/api/canchas/${c.id}/tarifas`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const def = res.data.find(x => x.es_default);
+        if (def) m[c.id!] = Number(def.tarifa);
+      })
+    ).then(() => setPrices(m));
   }, [courts]);
 
   const sortedCourts = useMemo(() => {
@@ -159,10 +162,7 @@ export default function CompanyCourtsList() {
     </th>
   );
 
-  const empresaOptions: Option[] = empresas.map(e => ({
-    value: e.id,
-    label: e.nombre,
-  }));
+  const empresaOptions: Option[] = empresas.map(e => ({ value: e.id, label: e.nombre }));
 
   return (
     <>
@@ -171,9 +171,9 @@ export default function CompanyCourtsList() {
         <AdminNav />
         <main className="flex-1 p-8">
           <header className="flex justify-between mb-6 items-center">
-          <h1 className="text-2xl font-bold text-gray-800">
-            {selectedEmpresa ? `Canchas de ${selectedEmpresa.label}` : 'Mis Canchas'}
-          </h1>
+            <h1 className="text-2xl font-bold text-gray-800">
+              {selectedEmpresa ? `Canchas de ${selectedEmpresa.label}` : 'Mis Canchas'}
+            </h1>
             <div className="flex gap-4 items-center">
               <Select
                 options={empresaOptions}
@@ -239,23 +239,28 @@ export default function CompanyCourtsList() {
                           >
                             <FaEdit className="text-[#0B91C1]" size={16} />
                           </button>
-                          {c.estado === 1 ? (
-                            <button
-                              title="Desactivar"
-                              onClick={() => toggleEstado(c.id!, c.estado)}
-                              className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
-                            >
-                              Desactivar
-                            </button>
-                          ) : (
-                            <button
-                              title="Activar"
-                              onClick={() => toggleEstado(c.id!, c.estado)}
-                              className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
-                            >
-                              Activar
-                            </button>
+
+                          {/* show activate/deactivate only for admin */}
+                          {roleId === 1 && (
+                            c.estado === 1 ? (
+                              <button
+                                title="Desactivar"
+                                onClick={() => toggleEstado(c.id!, c.estado)}
+                                className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
+                              >
+                                Desactivar
+                              </button>
+                            ) : (
+                              <button
+                                title="Activar"
+                                onClick={() => toggleEstado(c.id!, c.estado)}
+                                className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
+                              >
+                                Activar
+                              </button>
+                            )
                           )}
+
                           <button
                             title="Eliminar"
                             onClick={() => handleDelete(c.id!)}

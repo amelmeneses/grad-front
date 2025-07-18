@@ -1,15 +1,17 @@
 // src/components/ManageCourts.tsx
 
-import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import AdminNav from './AdminNav';
 import { FaEdit, FaTrash, FaMoneyBillWave, FaClock } from 'react-icons/fa';
 import { Court } from '../interfaces/Court';
 import { Tariff } from '../interfaces/Tariff';
 import Navbar from './Navbar';
+import { jwtDecode } from 'jwt-decode';
 
 interface Company { id: number; nombre: string; }
+interface TokenPayload { role: number; }
 
 export default function ManageCourts() {
   const { empresaId } = useParams<{ empresaId: string }>();
@@ -18,13 +20,26 @@ export default function ManageCourts() {
   const [defaultPrice, setDefaultPrice] = useState<Record<number, number>>({});
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState<string | null>(null);
+  const [roleId,       setRoleId]       = useState<number | null>(null);
   const navigate = useNavigate();
+
+  // Decodificar rol del usuario
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const { role } = jwtDecode<TokenPayload>(token);
+        setRoleId(role);
+      } catch {
+        setRoleId(null);
+      }
+    }
+  }, []);
 
   const fetchCourts = useCallback(async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token')!;
-      // 1) Nombre empresa
       const [{ data: comp }, { data: courtList }] = await Promise.all([
         axios.get<Company>(`/api/empresas/${empresaId}`, { headers: { Authorization: `Bearer ${token}` } }),
         axios.get<Court[]>(`/api/canchas?empresa_id=${empresaId}`, { headers: { Authorization: `Bearer ${token}` } }),
@@ -32,7 +47,6 @@ export default function ManageCourts() {
       setCompanyName(comp.nombre);
       setCourts(courtList);
 
-      // 2) Obtener tarifa por defecto de cada cancha
       const map: Record<number, number> = {};
       await Promise.all(
         courtList.map(async c => {
@@ -96,17 +110,10 @@ export default function ManageCourts() {
 
   return (
     <>
-      {/* Header fijo */}
       <Navbar />
-
-      {/* Contenedor principal con margen superior para compensar el Navbar */}
       <div className="flex min-h-screen bg-white mt-19">
-        {/* Barra lateral admin */}
         <AdminNav />
-
-        {/* Contenido principal */}
         <main className="flex-1 p-8">
-          {/* Header */}
           <header className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold text-gray-800">Canchas de {companyName}</h1>
             <button
@@ -116,8 +123,6 @@ export default function ManageCourts() {
               Añadir Cancha
             </button>
           </header>
-
-          {/* Tabla */}
           <div className="overflow-x-auto">
             <table className="min-w-full bg-white border border-gray-200">
               <thead>
@@ -172,22 +177,27 @@ export default function ManageCourts() {
                             <FaEdit className="text-[#0B91C1]" size={16} />
                           </button>
 
-                          {court.estado === 1 ? (
-                            <button
-                              title="Desactivar Cancha"
-                              onClick={() => toggleEstado(court.id!, court.estado)}
-                              className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
-                            >
-                              Desactivar
-                            </button>
-                          ) : (
-                            <button
-                              title="Activar Cancha"
-                              onClick={() => toggleEstado(court.id!, court.estado)}
-                              className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
-                            >
-                              Activar
-                            </button>
+                          {/* Sólo mostrar activate/desactivate si es rol 1 (admin) */}
+                          {roleId === 1 && (
+                            <>
+                              {court.estado === 1 ? (
+                                <button
+                                  title="Desactivar Cancha"
+                                  onClick={() => toggleEstado(court.id!, court.estado)}
+                                  className="px-3 py-2 bg-red-100 text-red-700 border border-red-700 rounded-lg hover:bg-red-200 transition"
+                                >
+                                  Desactivar
+                                </button>
+                              ) : (
+                                <button
+                                  title="Activar Cancha"
+                                  onClick={() => toggleEstado(court.id!, court.estado)}
+                                  className="px-3 py-2 bg-green-100 text-green-700 border border-green-700 rounded-lg hover:bg-green-200 transition"
+                                >
+                                  Activar
+                                </button>
+                              )}
+                            </>
                           )}
 
                           <button
